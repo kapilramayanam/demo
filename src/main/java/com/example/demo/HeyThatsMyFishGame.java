@@ -1,6 +1,5 @@
 package com.example.demo;
 
-import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
@@ -9,29 +8,30 @@ import javafx.stage.Stage;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Polygon;
-import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
-
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HeyThatsMyFishGame extends Application {
+public class HeyThatsMyFishGame  {
 
     private static final int NUM_ROWS = 8;
     private static final double HEX_SIZE = 50;
     private static final double BOARD_PADDING = 50;
     private static final double GAP = 5;
-
+    private final int numPlayers;
     private List<Integer> fishTiles;
+    private Stage primaryStage;
 
-    @Override
-    public void start(Stage primaryStage) {
+    public HeyThatsMyFishGame(int numPlayers, Stage primaryStage) {
+        this.numPlayers = numPlayers;
+        this.primaryStage = primaryStage;
+    }
+
+    public void start() {
+        setupGameBoard();
+    }
+    public void setupGameBoard() {
         Pane root = new Pane();
 
         // Initialize the fish distribution based on the game's rules
@@ -57,7 +57,6 @@ public class HeyThatsMyFishGame extends Application {
         }
 
         Scene scene = new Scene(root, 970, 970); // Adjust the size of the scene as needed
-        primaryStage.setTitle("Hey That's My Fish!");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -71,9 +70,7 @@ public class HeyThatsMyFishGame extends Application {
         Collections.shuffle(fishTiles); // Shuffle the list to randomize the fish distribution
     }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+
 
     public class HexTile extends StackPane {
         public HexTile(double size, int fishCount) {
@@ -99,8 +96,7 @@ public class HeyThatsMyFishGame extends Application {
         }
 
         private ImageView createFishImageView(int fishCount) {
-            // Make sure the path starts with a '/' if the images are located at the root of the resources folder
-            String imagePath = "/Fish" + fishCount + ".png"; // Adjust this path as necessary
+            String imagePath = "/Fish" + fishCount + ".png";
             InputStream imageStream = getClass().getResourceAsStream(imagePath);
             if (imageStream == null) {
                 throw new RuntimeException("Cannot find resource: " + imagePath);
