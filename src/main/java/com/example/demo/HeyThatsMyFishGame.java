@@ -1,92 +1,124 @@
 package com.example.demo;
 
+import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HeyThatsMyFishGame  {
+import javafx.scene.layout.StackPane;
+
+
+
+public class HeyThatsMyFishGame extends Application {
 
     private static final int NUM_ROWS = 8;
     private static final double HEX_SIZE = 50;
     private static final double BOARD_PADDING = 50;
     private static final double GAP = 5;
-    private final int numPlayers;
-    private List<Integer> fishTiles;
+    private List<Integer> fishTiles = new ArrayList<>();
     private Stage primaryStage;
+    private Pane root;
+    private Scene scene;
 
-    public HeyThatsMyFishGame(int numPlayers, Stage primaryStage) {
-        this.numPlayers = numPlayers;
+    @Override
+    public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
-    }
-
-    public void start() {
-        setupGameBoard();
-    }
-    public void setupGameBoard() {
-        Pane root = new Pane();
-        HBox scoreBoxes = new HBox();
-        TextField playerScoreBox = new TextField("Player Score: " );
-        TextField opponentScoreBox = new TextField("Opponent Score: ");
-        scoreBoxes.getChildren().addAll(playerScoreBox, opponentScoreBox);
-        root.getChildren().add(scoreBoxes);
-
-        // Initialize the fish distribution based on the game's rules
-        initializeFishTiles();
-
-        for (int row = 0; row < NUM_ROWS; row++) {
-            int numColsInRow = row % 2 == 0 ? 7 : 8;
-
-            for (int col = 0; col < numColsInRow; col++) {
-                int fishCount = fishTiles.remove(0); // Remove a fish count from the list
-                HexTile hex = new HexTile(HEX_SIZE, fishCount);
-
-                double offsetX = (row % 2 == 0) ? (HEX_SIZE * 1.5) / 2 : 0;
-                double x = col * (HEX_SIZE * 1.90+ GAP) + offsetX + BOARD_PADDING;
-                double y = row * (HEX_SIZE * Math.sqrt(3)+GAP/4) + BOARD_PADDING;
-
-                hex.setTranslateX(x);
-                hex.setTranslateY(y);
-//                hex.setFill(row % 2 == col % 2 ? Color.SKYBLUE : Color.LIGHTBLUE);
-                root.getChildren().add(hex);
-
-            }
-        }
-
-        Scene scene = new Scene(root, 970, 970); // Adjust the size of the scene as needed
+        this.root = new Pane();
+        this.scene = new Scene(root, 900, 800);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    private void initializeFishTiles() {
-        fishTiles = new ArrayList<>();
-        // Add fish counts to the list based on the game's distribution
-        for (int i = 0; i < 30; i++) fishTiles.add(1); // 30 one-fish tiles
-        for (int i = 0; i < 20; i++) fishTiles.add(2); // 20 two-fish tiles
-        for (int i = 0; i < 10; i++) fishTiles.add(3); // 10 three-fish tiles
-        Collections.shuffle(fishTiles); // Shuffle the list to randomize the fish distribution
+    // Change this method to public to allow access from MainMenu
+    public void setupGame(int numPlayers) {
+        root.getChildren().clear();
+        initializeFishTiles();
+        createGameBoard(numPlayers);
+        primaryStage.show();
+    }
+
+    private void createGameBoard(int numPlayers) {
+        HBox penguinScreen = createPenguinDisplay();
+        penguinScreen.setAlignment(Pos.TOP_RIGHT);
+        root.getChildren().add(penguinScreen); // Optionally manage penguins based on players
+        VBox scoreScreen = createScoreBoardDisplay();
+        scoreScreen.setAlignment(Pos.TOP_LEFT);
+        root.getChildren().add(scoreScreen);
+        createGameTiles();
+    }
+
+    private HBox createPenguinDisplay() {
+        HBox penguinDisplay = new HBox(10);
+        addPenguins(penguinDisplay, "BluePeng", 4);
+        addPenguins(penguinDisplay, "RedPeng", 4);
+        return penguinDisplay;
+    }
+
+    private VBox createScoreBoardDisplay() {
+        VBox scores = new VBox(2);
+        TextField playerOneScore = new TextField("Player 1: ");
+        TextField playerTwoScore = new TextField("Player 2: ");
+        scores.getChildren().addAll(playerOneScore, playerTwoScore);
+        return scores;
+    }
+
+    private void addPenguins(HBox penguinDisplay, String baseFileName, int count) {
+        for (int i = 1; i <= count; i++) {
+            String imagePath = "/Pengs/" + baseFileName + i + ".jpg"; // Adjust the path as needed
+            InputStream imageStream = getClass().getResourceAsStream(imagePath);
+            if (imageStream == null) {
+                throw new RuntimeException("Cannot find resource: " + imagePath);
+            }
+            Image penguinImage = new Image(imageStream);
+            ImageView penguinView = new ImageView(penguinImage);
+            penguinView.setFitHeight(HEX_SIZE);
+            penguinView.setFitWidth(HEX_SIZE);
+            penguinDisplay.getChildren().add(penguinView);
+        }
     }
 
 
+    private void createGameTiles() {
+        for (int row = 0; row < NUM_ROWS; row++) {
+            int numColsInRow = row % 2 == 0 ? 7 : 8;
+            for (int col = 0; col < numColsInRow; col++) {
+                int fishCount = fishTiles.remove(0);
+                HexTile hex = new HexTile(HEX_SIZE, fishCount);
+                double offsetX = (row % 2 == 0) ? (HEX_SIZE * 1.5) / 2 : 0;
+                double x = col * (HEX_SIZE * 1.90 + GAP) + offsetX + BOARD_PADDING;
+                double y = row * (HEX_SIZE * Math.sqrt(3) + GAP / 4) + BOARD_PADDING;
+                hex.setTranslateX(x);
+                hex.setTranslateY(y);
+                root.getChildren().add(hex);
+            }
+        }
+    }
 
-    public class HexTile extends StackPane {
+    private void initializeFishTiles() {
+        fishTiles.clear();
+        for (int i = 0; i < 30; i++) fishTiles.add(1);
+        for (int i = 0; i < 20; i++) fishTiles.add(2);
+        for (int i = 0; i < 10; i++) fishTiles.add(3);
+        Collections.shuffle(fishTiles);
+    }
+
+    class HexTile extends StackPane {
         public HexTile(double size, int fishCount) {
-            Polygon hexagon = createHexagonShape(size);
-            hexagon.setFill(Color.LIGHTBLUE);
-            this.getChildren().add(hexagon);
-
-            ImageView fishImageView = createFishImageView(fishCount);
-            this.getChildren().add(fishImageView);
+            this.getChildren().add(createHexagonShape(size));
+            this.getChildren().add(createFishImageView(fishCount));
         }
 
         private Polygon createHexagonShape(double size) {
@@ -99,21 +131,20 @@ public class HeyThatsMyFishGame  {
             }
             hexagon.setStroke(Color.BLACK);
             hexagon.setStrokeWidth(1);
+            hexagon.setFill(Color.LIGHTBLUE);
             return hexagon;
         }
 
         private ImageView createFishImageView(int fishCount) {
             String imagePath = "/Fish" + fishCount + ".png";
-            InputStream imageStream = getClass().getResourceAsStream(imagePath);
-            if (imageStream == null) {
-                throw new RuntimeException("Cannot find resource: " + imagePath);
-            }
-            Image fishImage = new Image(imageStream);
+            Image fishImage = new Image(getClass().getResourceAsStream(imagePath), HEX_SIZE / 0.5, HEX_SIZE / 0.5, true, true);
             ImageView imageView = new ImageView(fishImage);
-            imageView.setFitHeight(HEX_SIZE /0.5 ); // Adjust size as needed
-            imageView.setFitWidth(HEX_SIZE /0.5);
             imageView.setPreserveRatio(true);
             return imageView;
         }
+    }
+
+    public static void main(String[] args) {
+        launch(args);
     }
 }

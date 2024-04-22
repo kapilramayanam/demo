@@ -2,8 +2,10 @@ package com.example.demo;
 
 import javafx.application.Application;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundImage;
@@ -13,12 +15,18 @@ import javafx.scene.layout.BackgroundSize;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
-import java.io.File;
 import java.net.MalformedURLException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.Objects;
 
 public class MainMenu extends Application {
+
+    private HeyThatsMyFishGame game; // Add a reference to the game instance
+
     @Override
     public void start(Stage primaryStage) throws MalformedURLException {
         VBox menuBox = new VBox(10);
@@ -26,27 +34,20 @@ public class MainMenu extends Application {
 
         Button onePlayerButton = new Button("Single Player");
         Button twoPlayerButton = new Button("Multiplayer");
-        URL imageUrl = new URL("https://cf.geekdo-images.com/opengraph/img/eLSN_BxdhDg97XS3hp5v3GX2AdI=/fit-in/1200x630/pic1004115.jpg");
-        //URL imageUrl = MainMenu.class.getResource("C://Users//gavin//Downloads//demo//src//main//java//com//example//demo//bg.jpeg");
-        if (imageUrl == null) {
-            System.err.println("Resource not found. Path may be incorrect.");
-        } else {
-            Image backgroundImage = new Image(imageUrl.toString());
-            BackgroundImage bgImage = new BackgroundImage(backgroundImage,
-                    BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
-                    BackgroundSize.DEFAULT);
-            menuBox.setBackground(new Background(bgImage));
-        }
+        // Initialize the game
+        this.game = new HeyThatsMyFishGame(); // Assuming no-args constructor or adjust as necessary
+        game.start(new Stage()); // Start the game on a new stage or use primary stage as needed
 
-        onePlayerButton.setOnAction(e -> {
-            HeyThatsMyFishGame game = new HeyThatsMyFishGame(1, primaryStage);
-            game.start();
-        });
+        onePlayerButton.setOnAction(e -> game.setupGame(1));
+        twoPlayerButton.setOnAction(e -> game.setupGame(2));
 
-        twoPlayerButton.setOnAction(e -> {
-            HeyThatsMyFishGame game = new HeyThatsMyFishGame(2, primaryStage);
-            game.start();
-        });
+        // Background setup
+        URL backgroundUrl = new URL("https://m.media-amazon.com/images/S/aplus-media/vc/f886c95f-470b-4f1f-bf6d-3ee40f65ed93._CR0,0,970,300_PT0_SX970__.jpg");
+        Image backgroundImage = new Image(backgroundUrl.toString());
+        BackgroundImage bgImage = new BackgroundImage(backgroundImage,
+                BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
+        menuBox.setBackground(new Background(bgImage));
 
         menuBox.getChildren().addAll(onePlayerButton, twoPlayerButton);
 
@@ -56,10 +57,7 @@ public class MainMenu extends Application {
         primaryStage.show();
     }
 
-    public static void main(String[] args) throws MalformedURLException {
-        URL resUrl = new URL("https://cf.geekdo-images.com/opengraph/img/eLSN_BxdhDg97XS3hp5v3GX2AdI=/fit-in/1200x630/pic1004115.jpg");
-        //URL resUrl = MainMenu.class.getResource("/bg.JPEG");
-        System.out.println("Resource URL: " + resUrl);
+    public static void main(String[] args) {
         launch(args);
     }
 }
