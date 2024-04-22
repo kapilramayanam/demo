@@ -1,6 +1,8 @@
 package com.example.demo;
 
 import javafx.scene.Scene;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.layout.Pane;
@@ -33,6 +35,11 @@ public class HeyThatsMyFishGame  {
     }
     public void setupGameBoard() {
         Pane root = new Pane();
+        HBox scoreBoxes = new HBox();
+        TextField playerScoreBox = new TextField("Player Score: " );
+        TextField opponentScoreBox = new TextField("Opponent Score: ");
+        scoreBoxes.getChildren().addAll(playerScoreBox, opponentScoreBox);
+        root.getChildren().add(scoreBoxes);
 
         // Initialize the fish distribution based on the game's rules
         initializeFishTiles();
