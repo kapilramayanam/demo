@@ -18,6 +18,8 @@ import java.util.Objects;
 
 public class MainMenu extends Application {
 
+    private HeyThatsMyFishGame game; // Add a reference to the game instance
+
     @Override
     public void start(Stage primaryStage) {
         VBox menuBox = new VBox(10);
@@ -26,26 +28,19 @@ public class MainMenu extends Application {
         Button onePlayerButton = new Button("Single Player");
         Button twoPlayerButton = new Button("Multiplayer");
 
-        URL imageUrl = MainMenu.class.getResource("/bg.JPEG");
-        if (imageUrl == null) {
-            System.err.println("Resource not found. Path may be incorrect.");
-        } else {
-            Image backgroundImage = new Image(imageUrl.toString());
-            BackgroundImage bgImage = new BackgroundImage(backgroundImage,
-                    BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
-                    BackgroundSize.DEFAULT);
-            menuBox.setBackground(new Background(bgImage));
-        }
+        // Initialize the game
+        this.game = new HeyThatsMyFishGame(); // Assuming no-args constructor or adjust as necessary
+        game.start(new Stage()); // Start the game on a new stage or use primary stage as needed
 
-        onePlayerButton.setOnAction(e -> {
-            HeyThatsMyFishGame game = new HeyThatsMyFishGame(1, primaryStage);
-            game.start();
-        });
+        onePlayerButton.setOnAction(e -> game.setupGame(1));
+        twoPlayerButton.setOnAction(e -> game.setupGame(2));
 
-        twoPlayerButton.setOnAction(e -> {
-            HeyThatsMyFishGame game = new HeyThatsMyFishGame(2, primaryStage);
-            game.start();
-        });
+        // Background setup
+        Image backgroundImage = new Image(getClass().getResourceAsStream("/bg.JPEG"));
+        BackgroundImage bgImage = new BackgroundImage(backgroundImage,
+                BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
+        menuBox.setBackground(new Background(bgImage));
 
         menuBox.getChildren().addAll(onePlayerButton, twoPlayerButton);
 
@@ -56,8 +51,6 @@ public class MainMenu extends Application {
     }
 
     public static void main(String[] args) {
-        URL resUrl = MainMenu.class.getResource("/bg.JPEG");
-        System.out.println("Resource URL: " + resUrl);
         launch(args);
     }
 }
