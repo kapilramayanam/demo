@@ -30,13 +30,18 @@ public class HeyThatsMyFishGame extends Application {
     private static final double GAP = 5;
     private static int numPlayers;
     private static int turn;
+    private static int playerScore;
+    private static int opponentScore;
     private static String buttonStyle = "-fx-min-height: 132px;\n" +
             "    -fx-min-width: 128px;\n" +
             "    -fx-background-size: 100% 100%;\n" +
             "    -fx-background-repeat: no-repeat;\n" +
             "    -fx-background-position: center 8px;";
     private List<Integer> fishTiles = new ArrayList<>();
+    private List<Integer> fishScores = new ArrayList<>();
     private List<TileButton> fishTileButtons = new ArrayList<>();
+    private TextField playerOneScore;
+    private TextField playerTwoScore;
     private Stage primaryStage;
     private Pane root;
     private Scene scene;
@@ -82,8 +87,8 @@ public class HeyThatsMyFishGame extends Application {
 
     private VBox createScoreBoardDisplay() {
         VBox scores = new VBox(2);
-        TextField playerOneScore = new TextField("Player 1: ");
-        TextField playerTwoScore = new TextField("Player 2: ");
+        playerOneScore = new TextField("Player 1: " + playerScore);
+        playerTwoScore = new TextField("Player 2: " + opponentScore);
         scores.getChildren().addAll(playerOneScore, playerTwoScore);
         return scores;
     }
@@ -202,7 +207,10 @@ public class HeyThatsMyFishGame extends Application {
                     imageView.setFitHeight(buttonHeight);
                     button.setGraphic(imageView);
                     if(button instanceof TileButton){
-                        ((TileButton) button).setFishID(0);
+                        int fishTileID = ((TileButton) button).getFishID();
+                        int fish = fishScores.get(fishTileID);
+                        playerScore += fish;
+                        playerOneScore.setText("Player 1: " + playerScore);
                     }
                     success = true;
                     turn += 1;
@@ -260,6 +268,9 @@ public class HeyThatsMyFishGame extends Application {
         for (int i = 0; i < 20; i++) fishTiles.add(2);
         for (int i = 0; i < 10; i++) fishTiles.add(3);
         Collections.shuffle(fishTiles);
+        for(int i = 0;i < fishTiles.size();i++){
+            fishScores.add(fishTiles.get(i));
+        }
     }
 
     class TileButton extends Button{
