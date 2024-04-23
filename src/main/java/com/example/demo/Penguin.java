@@ -67,6 +67,10 @@ public class Penguin implements Observer{
         return false;
     }
 
+    public int getScore(){
+        return this.pengScore;
+    }
+
     @Override
     public void update() {
         this.pengScore = (int) topic.getUpdate(this);

@@ -2,6 +2,8 @@ package com.example.demo;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
@@ -29,6 +31,7 @@ public class HeyThatsMyFishGame extends Application {
     private static final double BOARD_PADDING = 50;
     private static final double GAP = 5;
     private List<Integer> fishTiles = new ArrayList<>();
+    private List<Button> fishTileButtons = new ArrayList<>();
     private Stage primaryStage;
     private Pane root;
     private Scene scene;
@@ -96,13 +99,31 @@ public class HeyThatsMyFishGame extends Application {
             int numColsInRow = row % 2 == 0 ? 7 : 8;
             for (int col = 0; col < numColsInRow; col++) {
                 int fishCount = fishTiles.remove(0);
+                String imagePath = "/Fish" + fishCount + ".png";
+                Image fishImage = new Image(getClass().getResourceAsStream(imagePath),HEX_SIZE/2,HEX_SIZE/2,true,true);
+                ImageView buttonView = new ImageView(fishImage);
+                //buttonView.setPreserveRatio(true);
                 HexTile hex = new HexTile(HEX_SIZE, fishCount);
                 double offsetX = (row % 2 == 0) ? (HEX_SIZE * 1.5) / 2 : 0;
                 double x = col * (HEX_SIZE * 1.90 + GAP) + offsetX + BOARD_PADDING;
                 double y = row * (HEX_SIZE * Math.sqrt(3) + GAP / 4) + BOARD_PADDING;
+                TileButton tileButton = new TileButton(hex,buttonView);
+                //tileButton.setPrefSize(HEX_SIZE,HEX_SIZE);
+                tileButton.setLayoutX(x);
+                tileButton.setLayoutY(y);
+                tileButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+                //tileButton.setGraphic(new ImageView(imagePath));
+                if(fishCount == 1){
+                    tileButton.setOnAction(e -> System.out.println("Clicked one fish!"));
+                }else if(fishCount == 2){
+                    tileButton.setOnAction(e -> System.out.println("Clicked two fish!"));
+                }else{
+                    tileButton.setOnAction(e -> System.out.println("Clicked three fish!"));
+                }
+                fishTileButtons.add(tileButton);
                 hex.setTranslateX(x);
                 hex.setTranslateY(y);
-                root.getChildren().add(hex);
+                root.getChildren().add(tileButton);
             }
         }
     }
@@ -115,6 +136,18 @@ public class HeyThatsMyFishGame extends Application {
         Collections.shuffle(fishTiles);
     }
 
+    class TileButton extends Button{
+        private HexTile hex;
+        private ImageView imageView;
+        public TileButton(HexTile hex, ImageView imageView){
+            this.hex = hex;
+            this.imageView = imageView;
+            this.getChildren().addAll(hex, imageView);
+            this.setPrefWidth(hex.getBoundsInLocal().getWidth() + imageView.getFitWidth());
+            this.setPrefHeight(hex.getBoundsInLocal().getHeight() + imageView.getFitHeight());
+            this.setGraphic(imageView);
+        }
+    }
     class HexTile extends StackPane {
         public HexTile(double size, int fishCount) {
             this.getChildren().add(createHexagonShape(size));
