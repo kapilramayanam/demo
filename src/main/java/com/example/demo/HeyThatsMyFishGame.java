@@ -30,6 +30,11 @@ public class HeyThatsMyFishGame extends Application {
     private static final double HEX_SIZE = 50;
     private static final double BOARD_PADDING = 50;
     private static final double GAP = 5;
+    private static String buttonStyle = "-fx-min-height: 132px;\n" +
+            "    -fx-min-width: 128px;\n" +
+            "    -fx-background-size: 100% 100%;\n" +
+            "    -fx-background-repeat: no-repeat;\n" +
+            "    -fx-background-position: center 8px;";
     private List<Integer> fishTiles = new ArrayList<>();
     private List<Button> fishTileButtons = new ArrayList<>();
     private Stage primaryStage;
@@ -100,8 +105,9 @@ public class HeyThatsMyFishGame extends Application {
             for (int col = 0; col < numColsInRow; col++) {
                 int fishCount = fishTiles.remove(0);
                 String imagePath = "/Fish" + fishCount + ".png";
-                Image fishImage = new Image(getClass().getResourceAsStream(imagePath),HEX_SIZE/2,HEX_SIZE/2,true,true);
-                ImageView buttonView = new ImageView(fishImage);
+                Image fishImage = new Image(getClass().getResourceAsStream(imagePath),HEX_SIZE/0.5,HEX_SIZE/0.5,true,true);
+                ImageView buttonView = new ImageView();
+                buttonView.setImage(fishImage);
                 //buttonView.setPreserveRatio(true);
                 HexTile hex = new HexTile(HEX_SIZE, fishCount);
                 double offsetX = (row % 2 == 0) ? (HEX_SIZE * 1.5) / 2 : 0;
@@ -112,6 +118,7 @@ public class HeyThatsMyFishGame extends Application {
                 tileButton.setLayoutX(x);
                 tileButton.setLayoutY(y);
                 tileButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+                //tileButton.setStyle(buttonStyle);
                 //tileButton.setGraphic(new ImageView(imagePath));
                 if(fishCount == 1){
                     tileButton.setOnAction(e -> System.out.println("Clicked one fish!"));
@@ -142,6 +149,8 @@ public class HeyThatsMyFishGame extends Application {
         public TileButton(HexTile hex, ImageView imageView){
             this.hex = hex;
             this.imageView = imageView;
+            imageView.setFitWidth(this.getWidth());
+            imageView.setFitHeight(this.getHeight());
             this.getChildren().addAll(hex, imageView);
             this.setPrefWidth(hex.getBoundsInLocal().getWidth() + imageView.getFitWidth());
             this.setPrefHeight(hex.getBoundsInLocal().getHeight() + imageView.getFitHeight());
@@ -170,7 +179,7 @@ public class HeyThatsMyFishGame extends Application {
 
         private ImageView createFishImageView(int fishCount) {
             String imagePath = "/Fish" + fishCount + ".png";
-            Image fishImage = new Image(getClass().getResourceAsStream(imagePath), HEX_SIZE / 0.5, HEX_SIZE / 0.5, true, true);
+            Image fishImage = new Image(getClass().getResourceAsStream(imagePath), HEX_SIZE / 4, HEX_SIZE / 4, true, true);
             ImageView imageView = new ImageView(fishImage);
             imageView.setPreserveRatio(true);
             return imageView;
