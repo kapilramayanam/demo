@@ -27,6 +27,7 @@ public class HeyThatsMyFishGame extends Application {
     private static final double HEX_SIZE = 50;
     private static final double BOARD_PADDING = 50;
     private static final double GAP = 5;
+    private static int numPlayers;
     private static String buttonStyle = "-fx-min-height: 132px;\n" +
             "    -fx-min-width: 128px;\n" +
             "    -fx-background-size: 100% 100%;\n" +
@@ -49,6 +50,7 @@ public class HeyThatsMyFishGame extends Application {
 
     // Change this method to public to allow access from MainMenu
     public void setupGame(int numPlayers) {
+        this.numPlayers = numPlayers;
         root.getChildren().clear();
         initializeFishTiles();
         createGameBoard(numPlayers);
@@ -81,6 +83,7 @@ public class HeyThatsMyFishGame extends Application {
     }
 
     private void addPenguins(HBox penguinDisplay, String baseFileName, int count) {
+        //int turn = 1;
         for (int i = 1; i <= count; i++) {
             String imagePath = "/Pengs/" + baseFileName + i + ".jpg"; // Adjust the path as needed
             InputStream imageStream = getClass().getResourceAsStream(imagePath);
@@ -91,40 +94,11 @@ public class HeyThatsMyFishGame extends Application {
             ImageView penguinView = new ImageView(penguinImage);
             penguinView.setFitHeight(HEX_SIZE);
             penguinView.setFitWidth(HEX_SIZE);
-            enableDragAndDrop(penguinView);
-            /*
-            penguinView.setOnMousePressed(new EventHandler<MouseEvent>(){
-                public void handle(MouseEvent event){
-                    penguinView.setMouseTransparent(true);
-                    System.out.println("Event on Source: mouse pressed");
-                    event.setDragDetect(true);
+            if(numPlayers==1){
+                if((i==1||i==2||i==3||i==4) && baseFileName=="BluePeng"){
+                    enableDragAndDrop(penguinView);
                 }
-            });
-
-            penguinView.setOnMouseReleased(new EventHandler <MouseEvent>(){
-                public void handle(MouseEvent event){
-                    penguinView.setMouseTransparent(false);
-                    System.out.println("Event on Source: mouse released");
-                }
-            });
-
-            penguinView.setOnMouseDragged(new EventHandler <MouseEvent>(){
-                public void handle(MouseEvent event){
-                    System.out.println("Event on Source: mouse dragged");
-                    penguinView.setLayoutX(event.getSceneX());
-                    penguinView.setLayoutY(event.getSceneY());
-                    event.setDragDetect(false);
-                }
-            });
-            penguinView.setOnDragDetected(new EventHandler <MouseEvent>(){
-                public void handle(MouseEvent event){
-                    penguinView.startFullDrag();
-                    penguinView.setLayoutX(event.getSceneX());
-                    penguinView.setLayoutY(event.getSceneY());
-                    System.out.println("Event on Source: drag detected");
-                }
-            });
-             */
+            }
             penguinDisplay.getChildren().add(penguinView);
         }
     }
