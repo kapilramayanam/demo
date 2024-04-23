@@ -206,11 +206,26 @@ public class HeyThatsMyFishGame extends Application {
                     imageView.setFitWidth(buttonWidth);
                     imageView.setFitHeight(buttonHeight);
                     button.setGraphic(imageView);
-                    if(button instanceof TileButton){
-                        int fishTileID = ((TileButton) button).getFishID();
-                        int fish = fishScores.get(fishTileID);
-                        playerScore += fish;
-                        playerOneScore.setText("Player 1: " + playerScore);
+                    if(numPlayers==1){
+                        if(button instanceof TileButton){
+                            int fishTileID = ((TileButton) button).getFishID();
+                            int fish = fishScores.get(fishTileID);
+                            playerScore += fish;
+                            playerOneScore.setText("Player 1: " + playerScore);
+                        }
+                    }
+                    else if(numPlayers==2){
+                        if(button instanceof TileButton){
+                            int fishTileID = ((TileButton) button).getFishID();
+                            int fish = fishScores.get(fishTileID);
+                            if(turn % 2 == 1){
+                                playerScore += fish;
+                            }else{
+                                opponentScore += fish;
+                            }
+                            playerOneScore.setText("Player Score: " + playerScore);
+                            playerTwoScore.setText("Player Score: " + opponentScore);
+                        }
                     }
                     success = true;
                     turn += 1;
