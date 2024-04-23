@@ -1,15 +1,15 @@
 package com.example.demo;
 
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TextField;
+import javafx.scene.input.*;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -19,9 +19,6 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
-
-import javafx.scene.layout.StackPane;
-
 
 
 public class HeyThatsMyFishGame extends Application {
@@ -94,10 +91,113 @@ public class HeyThatsMyFishGame extends Application {
             ImageView penguinView = new ImageView(penguinImage);
             penguinView.setFitHeight(HEX_SIZE);
             penguinView.setFitWidth(HEX_SIZE);
+            enableDragAndDrop(penguinView);
+            /*
+            penguinView.setOnMousePressed(new EventHandler<MouseEvent>(){
+                public void handle(MouseEvent event){
+                    penguinView.setMouseTransparent(true);
+                    System.out.println("Event on Source: mouse pressed");
+                    event.setDragDetect(true);
+                }
+            });
+
+            penguinView.setOnMouseReleased(new EventHandler <MouseEvent>(){
+                public void handle(MouseEvent event){
+                    penguinView.setMouseTransparent(false);
+                    System.out.println("Event on Source: mouse released");
+                }
+            });
+
+            penguinView.setOnMouseDragged(new EventHandler <MouseEvent>(){
+                public void handle(MouseEvent event){
+                    System.out.println("Event on Source: mouse dragged");
+                    penguinView.setLayoutX(event.getSceneX());
+                    penguinView.setLayoutY(event.getSceneY());
+                    event.setDragDetect(false);
+                }
+            });
+            penguinView.setOnDragDetected(new EventHandler <MouseEvent>(){
+                public void handle(MouseEvent event){
+                    penguinView.startFullDrag();
+                    penguinView.setLayoutX(event.getSceneX());
+                    penguinView.setLayoutY(event.getSceneY());
+                    System.out.println("Event on Source: drag detected");
+                }
+            });
+             */
             penguinDisplay.getChildren().add(penguinView);
         }
     }
 
+    private void enableDragAndDrop(ImageView imageView){
+        imageView.setOnDragDetected(new EventHandler <MouseEvent>(){
+            public void handle(MouseEvent event){
+                Dragboard db = imageView.startDragAndDrop(TransferMode.MOVE);
+                ClipboardContent content = new ClipboardContent();
+                content.putImage(imageView.getImage());
+                db.setContent(content);
+                event.consume();
+            }
+        });
+        imageView.setOnDragOver(new EventHandler <DragEvent>(){
+            public void handle(DragEvent event){
+                if(event.getGestureSource() != imageView && event.getDragboard().hasImage()){
+                    event.acceptTransferModes(TransferMode.MOVE);
+                }
+                event.consume();
+            }
+        });
+        imageView.setOnDragDropped(new EventHandler <DragEvent>(){
+            public void handle(DragEvent event){
+                Dragboard db = event.getDragboard();
+                boolean success = false;
+                if (db.hasImage()) {
+                    imageView.setImage(db.getImage());
+                    success = true;
+                }
+                event.setDropCompleted(success);
+                event.consume();
+            }
+        });
+        imageView.setOnDragDone(new EventHandler <DragEvent>(){
+            public void handle(DragEvent event){
+                if(event.getTransferMode() == TransferMode.MOVE){
+                    imageView.setImage(null);
+                }
+                event.consume();
+            }
+        });
+    }
+
+    public void enableDragAndDropForButton(Button button){
+        button.setOnDragOver(new EventHandler<DragEvent>() {
+            public void handle(DragEvent event){
+                if(event.getGestureSource() != button && event.getDragboard().hasImage()){
+                    event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+                }
+                event.consume();
+            }
+        });
+
+        button.setOnDragDropped(new EventHandler<DragEvent>() {
+            public void handle(DragEvent event){
+                Dragboard db = event.getDragboard();
+                boolean success = false;
+                if(db.hasImage()){
+                    Image droppedImage = db.getImage();
+                    double buttonWidth = button.getWidth();
+                    double buttonHeight = button.getHeight();
+                    ImageView imageView = new ImageView(droppedImage);
+                    imageView.setFitWidth(buttonWidth);
+                    imageView.setFitHeight(buttonHeight);
+                    button.setGraphic(imageView);
+                    success = true;
+                }
+                event.setDropCompleted(success);
+                event.consume();
+            }
+        });
+    }
 
     private void createGameTiles() {
         for (int row = 0; row < NUM_ROWS; row++) {
@@ -120,6 +220,7 @@ public class HeyThatsMyFishGame extends Application {
                 tileButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
                 //tileButton.setStyle(buttonStyle);
                 //tileButton.setGraphic(new ImageView(imagePath));
+                enableDragAndDropForButton(tileButton);
                 if(fishCount == 1){
                     tileButton.setOnAction(e -> System.out.println("Clicked one fish!"));
                 }else if(fishCount == 2){
