@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 
 public class HeyThatsMyFishGame extends Application {
@@ -28,13 +29,14 @@ public class HeyThatsMyFishGame extends Application {
     private static final double BOARD_PADDING = 50;
     private static final double GAP = 5;
     private static int numPlayers;
+    private static int turn;
     private static String buttonStyle = "-fx-min-height: 132px;\n" +
             "    -fx-min-width: 128px;\n" +
             "    -fx-background-size: 100% 100%;\n" +
             "    -fx-background-repeat: no-repeat;\n" +
             "    -fx-background-position: center 8px;";
     private List<Integer> fishTiles = new ArrayList<>();
-    private List<Button> fishTileButtons = new ArrayList<>();
+    private List<TileButton> fishTileButtons = new ArrayList<>();
     private Stage primaryStage;
     private Pane root;
     private Scene scene;
@@ -59,11 +61,15 @@ public class HeyThatsMyFishGame extends Application {
 
     private void createGameBoard(int numPlayers) {
         HBox penguinScreen = createPenguinDisplay();
-        penguinScreen.setAlignment(Pos.TOP_RIGHT);
+        penguinScreen.setAlignment(Pos.TOP_LEFT);
         root.getChildren().add(penguinScreen); // Optionally manage penguins based on players
+        VBox pengAndScores = new VBox();
+        pengAndScores.getChildren().add(penguinScreen);
         VBox scoreScreen = createScoreBoardDisplay();
-        scoreScreen.setAlignment(Pos.TOP_LEFT);
-        root.getChildren().add(scoreScreen);
+        pengAndScores.getChildren().add(scoreScreen);
+        pengAndScores.setAlignment(Pos.TOP_RIGHT);
+        HBox.setHgrow(pengAndScores,Priority.ALWAYS);
+        root.getChildren().add(pengAndScores);
         createGameTiles();
     }
 
@@ -83,7 +89,9 @@ public class HeyThatsMyFishGame extends Application {
     }
 
     private void addPenguins(HBox penguinDisplay, String baseFileName, int count) {
-        //int turn = 1;
+        turn = 1;
+        Random rand = new Random();
+        ArrayList<Integer> pengChosen = new ArrayList<Integer>();
         for (int i = 1; i <= count; i++) {
             String imagePath = "/Pengs/" + baseFileName + i + ".jpg"; // Adjust the path as needed
             InputStream imageStream = getClass().getResourceAsStream(imagePath);
@@ -94,8 +102,36 @@ public class HeyThatsMyFishGame extends Application {
             ImageView penguinView = new ImageView(penguinImage);
             penguinView.setFitHeight(HEX_SIZE);
             penguinView.setFitWidth(HEX_SIZE);
+
+
             if(numPlayers==1){
-                if((i==1||i==2||i==3||i==4) && baseFileName=="BluePeng"){
+                //Player 1 Chooses penguin.
+                if(baseFileName=="BluePeng" && turn % 2 == 1){
+                    enableDragAndDrop(penguinView);
+                }
+                //Player 2 (i.e. AI) Chooses Penguin.
+                else if(baseFileName=="RedPeng" && turn % 2 == 0){
+                    int tileChoice = rand.nextInt(59) + 1;
+                    //Ensures we do not choose tile that has already been chosen.
+                    if(fishTileButtons.get(tileChoice).getFishID() == 0){
+                        while(fishTileButtons.get(tileChoice).getFishID()==0){
+                            tileChoice = rand.nextInt(59)+1;
+                        }
+                    }
+                    TileButton tileButtonChosen = fishTileButtons.get(tileChoice);
+                    double buttonWidth = tileButtonChosen.getWidth();
+                    double buttonHeight = tileButtonChosen.getHeight();
+                    penguinView.setFitWidth(buttonWidth);
+                    penguinView.setFitHeight(buttonHeight);
+                    tileButtonChosen.setGraphic(penguinView);
+                    turn += 1;
+                }
+            }else if(numPlayers==2){
+                if(baseFileName=="BluePeng"){
+                    System.out.println("Turn " + turn + ": Player 1 Choose Penguin");
+                    enableDragAndDrop(penguinView);
+                }else if(baseFileName=="RedPeng"){
+                    System.out.println("Turn " + turn + ": Player 2 Choose Penguin");
                     enableDragAndDrop(penguinView);
                 }
             }
@@ -165,7 +201,12 @@ public class HeyThatsMyFishGame extends Application {
                     imageView.setFitWidth(buttonWidth);
                     imageView.setFitHeight(buttonHeight);
                     button.setGraphic(imageView);
+                    if(button instanceof TileButton){
+                        ((TileButton) button).setFishID(0);
+                    }
                     success = true;
+                    turn += 1;
+                    System.out.println("You are now on turn: " + turn);
                 }
                 event.setDropCompleted(success);
                 event.consume();
@@ -174,6 +215,7 @@ public class HeyThatsMyFishGame extends Application {
     }
 
     private void createGameTiles() {
+        int fishID = 0;
         for (int row = 0; row < NUM_ROWS; row++) {
             int numColsInRow = row % 2 == 0 ? 7 : 8;
             for (int col = 0; col < numColsInRow; col++) {
@@ -187,7 +229,7 @@ public class HeyThatsMyFishGame extends Application {
                 double offsetX = (row % 2 == 0) ? (HEX_SIZE * 1.5) / 2 : 0;
                 double x = col * (HEX_SIZE * 1.90 + GAP) + offsetX + BOARD_PADDING;
                 double y = row * (HEX_SIZE * Math.sqrt(3) + GAP / 4) + BOARD_PADDING;
-                TileButton tileButton = new TileButton(hex,buttonView);
+                TileButton tileButton = new TileButton(hex,buttonView,fishID);
                 //tileButton.setPrefSize(HEX_SIZE,HEX_SIZE);
                 tileButton.setLayoutX(x);
                 tileButton.setLayoutY(y);
@@ -196,16 +238,18 @@ public class HeyThatsMyFishGame extends Application {
                 //tileButton.setGraphic(new ImageView(imagePath));
                 enableDragAndDropForButton(tileButton);
                 if(fishCount == 1){
-                    tileButton.setOnAction(e -> System.out.println("Clicked one fish!"));
-                }else if(fishCount == 2){
-                    tileButton.setOnAction(e -> System.out.println("Clicked two fish!"));
+                    tileButton.setOnAction(e -> System.out.println("Clicked on tile of id: " + tileButton.getFishID()));
+                }else if(fishCount == 2)
+                {
+                    tileButton.setOnAction(e -> System.out.println("Clicked on tile of id: " + tileButton.getFishID()));
                 }else{
-                    tileButton.setOnAction(e -> System.out.println("Clicked three fish!"));
+                    tileButton.setOnAction(e -> System.out.println("Clicked on tile of id: " + tileButton.getFishID()));
                 }
                 fishTileButtons.add(tileButton);
                 hex.setTranslateX(x);
                 hex.setTranslateY(y);
                 root.getChildren().add(tileButton);
+                fishID += 1;
             }
         }
     }
@@ -221,15 +265,25 @@ public class HeyThatsMyFishGame extends Application {
     class TileButton extends Button{
         private HexTile hex;
         private ImageView imageView;
-        public TileButton(HexTile hex, ImageView imageView){
+        private int fishID;
+        public TileButton(HexTile hex, ImageView imageView, int fishID){
             this.hex = hex;
             this.imageView = imageView;
+            this.fishID = fishID;
             imageView.setFitWidth(this.getWidth());
             imageView.setFitHeight(this.getHeight());
             this.getChildren().addAll(hex, imageView);
             this.setPrefWidth(hex.getBoundsInLocal().getWidth() + imageView.getFitWidth());
             this.setPrefHeight(hex.getBoundsInLocal().getHeight() + imageView.getFitHeight());
             this.setGraphic(imageView);
+        }
+
+        public int getFishID(){
+            return this.fishID;
+        }
+
+        public void setFishID(int newFishID){
+            this.fishID = newFishID;
         }
     }
     class HexTile extends StackPane {
