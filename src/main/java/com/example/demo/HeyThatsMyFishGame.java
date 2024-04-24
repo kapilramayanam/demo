@@ -13,6 +13,7 @@ import javafx.scene.shape.Polygon;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.media.AudioClip;
 import javafx.stage.Stage;
 
 import java.io.InputStream;
