@@ -16,10 +16,7 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 
 public class HeyThatsMyFishGame extends Application {
@@ -45,7 +42,11 @@ public class HeyThatsMyFishGame extends Application {
     private Stage primaryStage;
     private Pane root;
     private Scene scene;
-
+    private BoardAndMovement bm = new BoardAndMovement();
+    private Player playerOne = new Player();
+    private Player playerTwo;
+    private AI ai;
+    private Penguin selected;
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -58,6 +59,10 @@ public class HeyThatsMyFishGame extends Application {
     // Change this method to public to allow access from MainMenu
     public void setupGame(int numPlayers) {
         this.numPlayers = numPlayers;
+        if(numPlayers == 1)
+            ai = new AI();
+        else
+            playerTwo = new Player();
         root.getChildren().clear();
         initializeFishTiles();
         createGameBoard(numPlayers);
@@ -196,10 +201,24 @@ public class HeyThatsMyFishGame extends Application {
 
         button.setOnDragDropped(new EventHandler<DragEvent>() {
             public void handle(DragEvent event){
+                Penguin newPeng = new Penguin(bm);
                 Dragboard db = event.getDragboard();
                 boolean success = false;
+                boolean check = newPeng.setLocation(bm.activeSpots.get(fishTileButtons.indexOf(button)));
+                if(!check) {
+                    //TO DO: Add error message?
+                    return;
+                } else if (turn%2 == 1) { //TO DO: && correct penguin
+                    playerOne.addPenguin(newPeng);
+                } else if (numPlayers==2) { //TO DO: && correct penguin
+                    playerTwo.addPenguin(newPeng);
+                } else //Not correct penguin
+                    return;
+
+
                 if(db.hasImage()){
                     Image droppedImage = db.getImage();
+                    System.out.println(droppedImage.hashCode());
                     double buttonWidth = button.getWidth();
                     double buttonHeight = button.getHeight();
                     ImageView imageView = new ImageView(droppedImage);
@@ -212,6 +231,10 @@ public class HeyThatsMyFishGame extends Application {
                             int fish = fishScores.get(fishTileID);
                             playerScore += fish;
                             playerOneScore.setText("Player 1: " + playerScore);
+                        }
+                        turn += 1;
+                        if(ai.getPenguins().size() < 4) {
+                            ai.randomStart();
                         }
                     }
                     else if(numPlayers==2){
@@ -261,7 +284,14 @@ public class HeyThatsMyFishGame extends Application {
                 //tileButton.setGraphic(new ImageView(imagePath));
                 enableDragAndDropForButton(tileButton);
                 if(fishCount == 1){
-                    tileButton.setOnAction(e -> System.out.println("Clicked on tile of id: " + tileButton.getFishID()));
+                    tileButton.setOnAction(e -> {
+                        System.out.println("Clicked on tile of id: " + tileButton.getFishID());
+                        boolean move = attemptMovement(tileButton.getFishID());
+                        if(move) {
+                            //TO DO: Move the image of the penguin to the new button and indicate a new turn
+                        }
+                    });
+
                 }else if(fishCount == 2)
                 {
                     tileButton.setOnAction(e -> System.out.println("Clicked on tile of id: " + tileButton.getFishID()));
@@ -286,6 +316,7 @@ public class HeyThatsMyFishGame extends Application {
         for(int i = 0;i < fishTiles.size();i++){
             fishScores.add(fishTiles.get(i));
         }
+        bm.setStartSpots(fishTiles);
     }
 
     class TileButton extends Button{
@@ -340,6 +371,30 @@ public class HeyThatsMyFishGame extends Application {
             return imageView;
         }
     }
+
+    public boolean attemptMovement(int index) {
+        if(selected == null) {
+            selected = bm.penguinPresent(index);
+            if (selected == null)
+                System.out.println("Penguin not found");
+            else
+                System.out.println("Penguin found");
+            return false;
+        } else {
+            Penguin validate = bm.penguinPresent(index);
+            int[] old = selected.location;
+            boolean check = selected.setLocation(bm.activeSpots.get(index));
+            if (check) {
+                selected = null;
+                System.out.println("Moved penguin at " + Arrays.toString(old) +
+                        " to " + Arrays.toString(bm.activeSpots.get(index)));
+            } else
+                System.out.println("Penguin at " + Arrays.toString(old) +
+                        " cannot be moved to " + Arrays.toString(bm.activeSpots.get(index)));
+            return check;
+        }
+    }
+
 
     public static void main(String[] args) {
         launch(args);
