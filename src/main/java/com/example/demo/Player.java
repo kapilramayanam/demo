@@ -9,6 +9,11 @@ public class Player implements Subject{
     private static ArrayList<Observer> observers;
     private static boolean changed;
     private final Object MUTEX = new Object();
+
+    public Player(){
+        score = 0;
+        penguins = new ArrayList<>();
+    }
     public Player(int score, ArrayList<Penguin> penguins){
         this.score = score;
         this.penguins = penguins;
@@ -22,6 +27,12 @@ public class Player implements Subject{
         return this.score;
     }
 
+    public void addPenguin(Penguin p) {
+        penguins.add(p);
+        p.bm.addPenguins(p);
+    }
+
+    public ArrayList<Penguin> getPenguins(){return penguins;}
 
     @Override
     public void register(Observer obj) {

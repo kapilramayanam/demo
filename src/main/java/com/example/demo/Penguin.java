@@ -2,6 +2,7 @@ package com.example.demo;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -22,9 +23,8 @@ public class Penguin implements Observer{
             desired[0] = location[0] + i[0];
             desired[1] = location[1] + i[1];
             desired[2] = location[2] + i[2];
-            if(bm.validMove(this, desired) == true) {
+            if(bm.validMove(this, desired))
                 return false;
-            }
         }
         return true;
     }
@@ -32,22 +32,26 @@ public class Penguin implements Observer{
     //Sets a new location and returns true if the move can be made
     //Returns false the move cannot be made
     public boolean setLocation(int[] newLocation) {
-        //if a location hasn't been set yet
 
+        //if a location hasn't been set yet
         if(location[0] == 0) {
-            if (BoardAndMovement.activeSpots.stream().anyMatch(a -> Arrays.equals(a, 0, 3, newLocation, 0,3))
-                    && BoardAndMovement.activePenguins.stream().noneMatch(a -> Arrays.equals(a.location, 0, 3, newLocation, 0,3)))
+            //if (bm.activeSpots.stream().filter(Objects::nonNull).anyMatch(a -> Arrays.equals(a, 0, 3, newLocation, 0,3))
+            //&& bm.activePenguins.stream().filter(Objects::nonNull).noneMatch(a -> Arrays.equals(a.location, 0, 3, newLocation, 0,3)))
+            if (bm.activeSpots.stream().filter(Objects::nonNull).anyMatch(a -> a == newLocation)
+                    && bm.activePenguins.stream().filter(Objects::nonNull).noneMatch(a -> a.location == newLocation))
             {
-                int[] aSpot = BoardAndMovement.activeSpots.stream().filter(a -> Arrays.equals(a, 0, 3, newLocation, 0,3)).findFirst().get();
+                //int[] aSpot = bm.activeSpots.stream().filter(Objects::nonNull).filter(a -> Arrays.equals(a, 0, 3, newLocation, 0,3)).findFirst().get();
+                int[] aSpot = bm.activeSpots.stream().filter(Objects::nonNull).filter(a -> a == newLocation).findFirst().get();
                 if(aSpot[3] == 1) {
                     location = newLocation;
+                    bm.addPenguins(this);
                     return true;
                 }
             }
 
             //All below for printing tests
             //Can be deleted once testing is complete
-            Optional<int[]> b = BoardAndMovement.activeSpots.stream().filter(a -> Arrays.equals(a, 0, 3, newLocation, 0,3)).findFirst();
+            Optional<int[]> b = bm.activeSpots.stream().filter(Objects::nonNull).filter(a -> Arrays.equals(a, 0, 3, newLocation, 0,3)).findFirst();
             if(b.isPresent()) {
                 System.out.println(Arrays.toString(b.get())+ " is occupied or not 1-fish");
             } else {
@@ -58,7 +62,6 @@ public class Penguin implements Observer{
         }
 
         if(bm.validMove(this, newLocation)) {
-            //System.out.println("\t" + Arrays.toString(location));
             bm.removeSpot(location);
             location = newLocation;
             return true;
