@@ -32,8 +32,14 @@ public class MainMenu extends Application {
         this.game = new HeyThatsMyFishGame(); // Assuming no-args constructor or adjust as necessary
         game.start(new Stage()); // Start the game on a new stage or use primary stage as needed
 
-        onePlayerButton.setOnAction(e -> game.setupGame(1));
-        twoPlayerButton.setOnAction(e -> game.setupGame(2));
+        onePlayerButton.setOnAction(e ->{
+            game.setupGame(1);
+            primaryStage.hide();
+        });
+        twoPlayerButton.setOnAction(e -> {
+            game.setupGame(2);
+            primaryStage.hide();
+        });
 
         // Background setup
         Image backgroundImage = new Image(getClass().getResourceAsStream("/bg.JPEG"));

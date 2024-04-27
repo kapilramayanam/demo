@@ -58,7 +58,7 @@ public class HeyThatsMyFishGame extends Application {
         this.root = new Pane();
         this.scene = new Scene(root, 900, 800);
         primaryStage.setScene(scene);
-        primaryStage.show();
+        primaryStage.hide();
     }
 
     // Change this method to public to allow access from MainMenu
