@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import javafx.scene.image.ImageView;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Objects;
@@ -12,10 +13,15 @@ public class Penguin implements Observer{
     final int[][] directions = {{0,-1,1},{0,1,-1},{-1,0,1},{1,0,-1},{1,-1,0},{-1,1,0}};
     private Subject topic;
     private int pengScore;
-    Penguin(BoardAndMovement bam) {
+    private ImageView imageView;
+    Penguin(BoardAndMovement bam, ImageView imageView) {
         bm = bam;
+        this.imageView = imageView;
     }
 
+    public ImageView getImageView() {
+        return imageView;
+    }
     //If a penguin is completely isolated, returns true. Else, returns false
     public boolean penguinIsolation() {
         int[] desired = new int[3];

@@ -2,6 +2,7 @@ package com.example.demo;
 
 import javafx.application.Application;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
@@ -16,6 +17,7 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.*;
 
 
@@ -47,6 +49,9 @@ public class HeyThatsMyFishGame extends Application {
     private Player playerTwo;
     private AI ai;
     private Penguin selected;
+    private ArrayList<Image> bluePenguins = new ArrayList<>();
+    private ArrayList<Image> redPenguins = new ArrayList<>();
+    private ImageView imageView = new ImageView();
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -85,8 +90,8 @@ public class HeyThatsMyFishGame extends Application {
 
     private HBox createPenguinDisplay() {
         HBox penguinDisplay = new HBox(10);
-        addPenguins(penguinDisplay, "BluePeng", 4);
-        addPenguins(penguinDisplay, "RedPeng", 4);
+        bluePenguins = addPenguins(penguinDisplay, "BluePeng", 4);
+        redPenguins = addPenguins(penguinDisplay, "RedPeng", 4); //give the penguin images to player classes
         return penguinDisplay;
     }
 
@@ -98,10 +103,10 @@ public class HeyThatsMyFishGame extends Application {
         return scores;
     }
 
-    private void addPenguins(HBox penguinDisplay, String baseFileName, int count) {
+    private ArrayList<Image> addPenguins(HBox penguinDisplay, String baseFileName, int count) {
         turn = 1;
         Random rand = new Random();
-        ArrayList<Integer> pengChosen = new ArrayList<Integer>();
+        ArrayList<Image> pengChosen = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
             String imagePath = "/Pengs/" + baseFileName + i + ".jpg"; // Adjust the path as needed
             InputStream imageStream = getClass().getResourceAsStream(imagePath);
@@ -109,10 +114,10 @@ public class HeyThatsMyFishGame extends Application {
                 throw new RuntimeException("Cannot find resource: " + imagePath);
             }
             Image penguinImage = new Image(imageStream);
+            pengChosen.add(penguinImage);
             ImageView penguinView = new ImageView(penguinImage);
             penguinView.setFitHeight(HEX_SIZE);
             penguinView.setFitWidth(HEX_SIZE);
-
 
             if(numPlayers==1){
                 //Player 1 Chooses penguin.
@@ -138,51 +143,77 @@ public class HeyThatsMyFishGame extends Application {
                 }
             }else if(numPlayers==2){
                 if(baseFileName=="BluePeng"){
-                    System.out.println("Turn " + turn + ": Player 1 Choose Penguin");
+                    //System.out.println("Turn " + turn + ": Player 1 Choose Penguin");
                     enableDragAndDrop(penguinView);
                 }else if(baseFileName=="RedPeng"){
-                    System.out.println("Turn " + turn + ": Player 2 Choose Penguin");
+                    //System.out.println("Turn " + turn + ": Player 2 Choose Penguin");
                     enableDragAndDrop(penguinView);
                 }
             }
             penguinDisplay.getChildren().add(penguinView);
         }
+        for(Image image : pengChosen) {System.out.println("Peng: " + image);}
+        return pengChosen;
     }
+    private void enableDragAndDrop(ImageView iv){
 
-    private void enableDragAndDrop(ImageView imageView){
-        imageView.setOnDragDetected(new EventHandler <MouseEvent>(){
+        iv.setOnDragDetected(new EventHandler <MouseEvent>(){
             public void handle(MouseEvent event){
-                Dragboard db = imageView.startDragAndDrop(TransferMode.MOVE);
-                ClipboardContent content = new ClipboardContent();
-                content.putImage(imageView.getImage());
-                db.setContent(content);
-                event.consume();
-            }
-        });
-        imageView.setOnDragOver(new EventHandler <DragEvent>(){
-            public void handle(DragEvent event){
-                if(event.getGestureSource() != imageView && event.getDragboard().hasImage()){
-                    event.acceptTransferModes(TransferMode.MOVE);
+                imageView = iv;
+                if((turn % 2 == 1 && redPenguins.stream().anyMatch(a -> a.equals(iv.getImage())))
+                        || (turn % 2 == 0 && bluePenguins.stream().anyMatch(a -> a.equals(iv.getImage())))) {
+                    return;
                 }
+                /*if(turn % 2 == 1){
+                    bluePenguins.stream().filter(a -> a.equals(imageView.getImage())).
+                            findFirst().ifPresent(a ->
+                            });
+                }*/
+                Dragboard db = iv.startDragAndDrop(TransferMode.MOVE);
+                ClipboardContent content = new ClipboardContent();
+                content.putImage(iv.getImage());
+                db.setContent(content);
+                //System.out.println("\t" + db.getImage() + "\t" + bluePenguins.get(0));
+                //db.getImage() == bluePenguins.get(0);
                 event.consume();
             }
         });
-        imageView.setOnDragDropped(new EventHandler <DragEvent>(){
+        iv.setOnDragOver(new EventHandler <DragEvent>(){
+            public void handle(DragEvent event){
+                if(event.getGestureSource() != iv && event.getDragboard().hasImage()){
+                    event.acceptTransferModes(TransferMode.MOVE);
+
+                    //System.out.println("imageview dragOver: " + imageView.getImage());
+
+                }
+
+                event.consume();
+            }
+        });
+        iv.setOnDragDropped(new EventHandler <DragEvent>(){
             public void handle(DragEvent event){
                 Dragboard db = event.getDragboard();
                 boolean success = false;
                 if (db.hasImage()) {
+                    System.out.println("DbIV dropped: " + db.getImage());
+                    System.out.println("\tIV cur: " + iv.getImage());
+                    iv.setImage(db.getImage());
+                    System.out.println("\tIV new: " + iv.getImage());
                     imageView.setImage(db.getImage());
+                    System.out.println("\timageView new: " + imageView.getImage());
                     success = true;
                 }
+                //TO DO: Handle better
+
                 event.setDropCompleted(success);
                 event.consume();
             }
         });
-        imageView.setOnDragDone(new EventHandler <DragEvent>(){
+        iv.setOnDragDone(new EventHandler <DragEvent>(){
             public void handle(DragEvent event){
                 if(event.getTransferMode() == TransferMode.MOVE){
-                    imageView.setImage(null);
+                    System.out.println("iv done: " + iv.getImage());
+                    iv.setImage(null);
                 }
                 event.consume();
             }
@@ -194,6 +225,7 @@ public class HeyThatsMyFishGame extends Application {
             public void handle(DragEvent event){
                 if(event.getGestureSource() != button && event.getDragboard().hasImage()){
                     event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+                    //System.out.println("button drag: " + event.getDragboard().getImage());
                 }
                 event.consume();
             }
@@ -201,30 +233,44 @@ public class HeyThatsMyFishGame extends Application {
 
         button.setOnDragDropped(new EventHandler<DragEvent>() {
             public void handle(DragEvent event){
-                Penguin newPeng = new Penguin(bm);
                 Dragboard db = event.getDragboard();
                 boolean success = false;
-                boolean check = newPeng.setLocation(bm.activeSpots.get(fishTileButtons.indexOf(button)));
-                if(!check) {
-                    //TO DO: Add error message?
-                    return;
-                } else if (turn%2 == 1) { //TO DO: && correct penguin
-                    playerOne.addPenguin(newPeng);
-                } else if (numPlayers==2) { //TO DO: && correct penguin
-                    playerTwo.addPenguin(newPeng);
-                } else //Not correct penguin
-                    return;
 
-
-                if(db.hasImage()){
-                    Image droppedImage = db.getImage();
-                    System.out.println(droppedImage.hashCode());
+                if(db.hasImage()) {
+                    System.out.println("Dropped button: " + imageView.getImage());
+                    System.out.println(db.getImage());
+                    //Image droppedImage = db.getImage();
                     double buttonWidth = button.getWidth();
                     double buttonHeight = button.getHeight();
-                    ImageView imageView = new ImageView(droppedImage);
-                    imageView.setFitWidth(buttonWidth);
-                    imageView.setFitHeight(buttonHeight);
-                    button.setGraphic(imageView);
+
+                    Penguin newPeng = new Penguin(bm, new ImageView(imageView.getImage()));
+
+                    boolean check = newPeng.setLocation(bm.activeSpots.get(fishTileButtons.indexOf(button)));
+                    if(!check) {
+                        //TO DO: Add error message?
+                        return;
+                    } else if (turn%2 == 1) { //TO DO: && correct penguin
+                        playerOne.addPenguinPlayer(newPeng);
+                    } else if (numPlayers==2) { //TO DO: && correct penguin
+                        playerTwo.addPenguinPlayer(newPeng);
+                    } else //Not correct penguin
+                        return;
+
+
+                    newPeng.getImageView().setFitWidth(buttonWidth);
+                    newPeng.getImageView().setFitHeight(buttonHeight);
+                    button.setGraphic(newPeng.getImageView());
+
+
+
+                        /*System.out.println(imageView.getImage());
+                        for(Image image : bluePenguins){
+                            System.out.println("\t" +image);
+                        }
+                        for(Image image : redPenguins){
+                            System.out.println("\t"+ image);
+                        }*/
+
                     if(numPlayers==1){
                         if(button instanceof TileButton){
                             int fishTileID = ((TileButton) button).getFishID();
@@ -252,7 +298,7 @@ public class HeyThatsMyFishGame extends Application {
                     }
                     success = true;
                     turn += 1;
-                    System.out.println("You are now on turn: " + turn);
+                    //System.out.println("You are now on turn: " + turn);
                 }
                 event.setDropCompleted(success);
                 event.consume();
@@ -283,21 +329,21 @@ public class HeyThatsMyFishGame extends Application {
                 //tileButton.setStyle(buttonStyle);
                 //tileButton.setGraphic(new ImageView(imagePath));
                 enableDragAndDropForButton(tileButton);
-                if(fishCount == 1){
-                    tileButton.setOnAction(e -> {
-                        System.out.println("Clicked on tile of id: " + tileButton.getFishID());
-                        boolean move = attemptMovement(tileButton.getFishID());
-                        if(move) {
-                            //TO DO: Move the image of the penguin to the new button and indicate a new turn
-                        }
-                    });
-
+                //if(fishCount == 1){
+                tileButton.setOnAction(e -> {
+                    Penguin penguin = movePenguin(tileButton.getFishID());
+                    if(penguin != null) {
+                        tileButton.setGraphic(penguin.getImageView());
+                        selected = null;
+                    }
+                });
+                /*
                 }else if(fishCount == 2)
                 {
                     tileButton.setOnAction(e -> System.out.println("Clicked on tile of id: " + tileButton.getFishID()));
                 }else{
                     tileButton.setOnAction(e -> System.out.println("Clicked on tile of id: " + tileButton.getFishID()));
-                }
+                }*/
                 fishTileButtons.add(tileButton);
                 hex.setTranslateX(x);
                 hex.setTranslateY(y);
@@ -372,29 +418,33 @@ public class HeyThatsMyFishGame extends Application {
         }
     }
 
-    public boolean attemptMovement(int index) {
-        if(selected == null) {
-            selected = bm.penguinPresent(index);
-            if (selected == null)
-                System.out.println("Penguin not found");
-            else
-                System.out.println("Penguin found");
-            return false;
-        } else {
-            Penguin validate = bm.penguinPresent(index);
-            int[] old = selected.location;
-            boolean check = selected.setLocation(bm.activeSpots.get(index));
-            if (check) {
-                selected = null;
-                System.out.println("Moved penguin at " + Arrays.toString(old) +
-                        " to " + Arrays.toString(bm.activeSpots.get(index)));
-            } else
-                System.out.println("Penguin at " + Arrays.toString(old) +
-                        " cannot be moved to " + Arrays.toString(bm.activeSpots.get(index)));
-            return check;
+    Penguin movePenguin(int fishID) {
+        if(playerTwo.getPenguins().size() < 4) {return null;}
+        Penguin validate = bm.penguinPresent(fishID);
+        if(!(selected == null && validate == null)) {
+            if (validate != null &&
+                    ((turn % 2 == 1 && redPenguins.stream().anyMatch(a -> a.equals(validate.getImageView().getImage()))) ||
+                            (turn % 2 == 0 && bluePenguins.stream().anyMatch(a -> a.equals(validate.getImageView().getImage()))))) {
+                System.out.println(validate.getImageView().getImage() + " is not your penguin player " + turn%2);
+                for (Image image : bluePenguins) {System.out.println("\t" + image);}
+                return null;
+            } else if (validate != null) {
+                selected = validate;
+                return null;
+            }
+            else {
+                int[] old = selected.location;
+                if (selected.setLocation(bm.activeSpots.get(fishID))) {
+                    System.out.println("Moved penguin at " + Arrays.toString(old) +
+                            " to " + Arrays.toString(selected.location));
+                    turn++;
+                    return selected;
+                }
+            }
         }
+        //TO DO: Move the image of the penguin to the new button and indicate a new turn
+        return null;
     }
-
 
     public static void main(String[] args) {
         launch(args);

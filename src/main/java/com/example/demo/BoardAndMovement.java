@@ -10,9 +10,9 @@ public class BoardAndMovement {
         BoardAndMovement bm = new BoardAndMovement();
         bm.setStartSpots(bm.numbers());
 
-        bm.activePenguins.add(new Penguin(bm));
-        bm.activePenguins.add(new Penguin(bm));
         /*bm.activePenguins.add(new Penguin(bm));
+        bm.activePenguins.add(new Penguin(bm));
+        bm.activePenguins.add(new Penguin(bm));
         bm.activePenguins.add(new Penguin(bm));
         bm.activePenguins.add(new Penguin(bm));
         bm.activePenguins.add(new Penguin(bm));
@@ -106,9 +106,6 @@ public class BoardAndMovement {
             r++;
         }
 
-        for(int[] is : activeSpots) {
-            System.out.println(Arrays.toString(is));
-        }
     }
 
     //takes two int[] of 3 values and returns an int[] of the direction between the two points
@@ -222,7 +219,7 @@ public class BoardAndMovement {
     }
 
     public Penguin penguinPresent(int index) {
-        Optional <Penguin> pen = activePenguins.stream().filter(a -> a.location == activeSpots.get(index)).findFirst();
+        Optional<Penguin> pen = activePenguins.stream().filter(Objects::nonNull).filter(a -> a.location == activeSpots.get(index)).findFirst();
         return pen.orElse(null);
     }
 }

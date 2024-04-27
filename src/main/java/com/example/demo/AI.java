@@ -97,7 +97,8 @@ public class AI extends Player{
 
     //Places first unplaced penguin onto the board
     public boolean randomStart() {
-        List<int[]> allValids;
+        return false;
+        /*List<int[]> allValids;
 
         //Fail safe: if don't need to add another penguin just return true
         if(getPenguins().size() >= 4)
@@ -112,6 +113,6 @@ public class AI extends Player{
 
         //NOTE: Gives Penguin the actual BoardAndMovement spot
         int[] chosen = allValids.get(rand.nextInt(0,allValids.size()));
-        return p.setLocation(chosen);
+        return p.setLocation(chosen);*/
     }
 }
