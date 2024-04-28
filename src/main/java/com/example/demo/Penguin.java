@@ -42,7 +42,7 @@ public class Penguin implements Observer{
             {
                 //int[] aSpot = bm.activeSpots.stream().filter(Objects::nonNull).filter(a -> Arrays.equals(a, 0, 3, newLocation, 0,3)).findFirst().get();
                 int[] aSpot = bm.activeSpots.stream().filter(Objects::nonNull).filter(a -> a == newLocation).findFirst().get();
-                if(aSpot[3] == 1 || aSpot[3] == 2 || aSpot[3] == 3) {
+                if(aSpot[3] == 1) {
                     location = newLocation;
                     bm.addPenguins(this);
                     return true;
