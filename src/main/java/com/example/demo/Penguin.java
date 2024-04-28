@@ -42,7 +42,7 @@ public class Penguin implements Observer{
             {
                 //int[] aSpot = bm.activeSpots.stream().filter(Objects::nonNull).filter(a -> Arrays.equals(a, 0, 3, newLocation, 0,3)).findFirst().get();
                 int[] aSpot = bm.activeSpots.stream().filter(Objects::nonNull).filter(a -> a == newLocation).findFirst().get();
-                if(aSpot[3] == 1) {
+                if(aSpot[3] == 1 || aSpot[3] == 2 || aSpot[3] == 3) {
                     location = newLocation;
                     bm.addPenguins(this);
                     return true;
@@ -53,7 +53,8 @@ public class Penguin implements Observer{
             //Can be deleted once testing is complete
             Optional<int[]> b = bm.activeSpots.stream().filter(Objects::nonNull).filter(a -> Arrays.equals(a, 0, 3, newLocation, 0,3)).findFirst();
             if(b.isPresent()) {
-                System.out.println(Arrays.toString(b.get())+ " is occupied or not 1-fish");
+
+                System.out.println(Arrays.toString(b.get())+ " is occupied");
             } else {
                 System.out.println(Arrays.toString(newLocation) + " is missing");
             }
