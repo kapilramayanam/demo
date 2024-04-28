@@ -5,78 +5,10 @@ import java.util.*;
 public class BoardAndMovement {
     public ArrayList<int[]> activeSpots = new ArrayList<>();
     public ArrayList<Penguin> activePenguins = new ArrayList<>();
-
-    public static void main(String[] args) {
-        BoardAndMovement bm = new BoardAndMovement();
-        bm.setStartSpots(bm.numbers());
-
-        /*bm.activePenguins.add(new Penguin(bm));
-        bm.activePenguins.add(new Penguin(bm));
-        bm.activePenguins.add(new Penguin(bm));
-        bm.activePenguins.add(new Penguin(bm));
-        bm.activePenguins.add(new Penguin(bm));
-        bm.activePenguins.add(new Penguin(bm));
-        bm.activePenguins.add(new Penguin(bm));
-        bm.activePenguins.add(new Penguin(bm));
-
-        bm.activePenguins.get(0).setLocation(new int[]{1,8,8});
-        bm.activePenguins.get(1).setLocation(new int[]{5,1,11});
-        bm.activePenguins.get(2).setLocation(new int[]{8,8,1});
-        bm.activePenguins.get(3).setLocation(new int[]{11,1,5});
-        bm.activePenguins.get(4).setLocation(new int[]{3,5,9});
-        bm.activePenguins.get(5).setLocation(new int[]{5,8,4});
-        bm.activePenguins.get(6).setLocation(new int[]{8,5,4});
-        bm.activePenguins.get(7).setLocation(new int[]{6,3,8}); */
-        bm.activePenguins.get(0).setLocation(new int[]{6,4,7});
-        //bm.activePenguins.get(1).setLocation(new int[]{6,4,7});
-
-        //bm.activeSpots.removeIf(a -> Arrays.equals(a, 0, 3, new int[]{10,1,6}, 0,3));
-        //bm.activeSpots.removeIf(a -> Arrays.equals(a, 0, 3, new int[]{10,2,5}, 0,3));
-        //bm.activeSpots.removeIf(a -> Arrays.equals(a, 0, 3, new int[]{9,3,5}, 0,3));
-        //bm.activeSpots.removeIf(a -> Arrays.equals(a, 0, 3, new int[]{9,4,4}, 0,3));
-        //bm.activeSpots.removeIf(a -> Arrays.equals(a, 0, 3, new int[]{10,4,3}, 0,3));
-        //System.out.println(bm.activeSpots.size());
-        //bm.checkForIsolation();
-        //System.out.println(bm.activeSpots.size());
-
-
-        //bm.activePenguins.get(0).setLocation(new int[]{2,7,8});
-        //bm.activePenguins.add(new Penguin(bm));
-        //bm.activePenguins.get(1).setLocation(new int[]{1,8,8});
-        /*for (Penguin i : activePenguins) {
-            System.out.println("*" + Arrays.toString(i.location));
-        }
-
-        activePenguins.get(1).setLocation(new int[]{2,7,8});
-        for (Penguin i : activePenguins) {
-            System.out.println("*" + Arrays.toString(i.location));
-        }*/
-        //activePenguins.get(1).setLocation(new int[]{});
-        //activePenguins.get(0).setLocation(new int[]{2,7,8});
-
-        //System.out.println(Arrays.toString(activePenguins.get(0).location) + " equals: " +
-        //bm.match(activePenguins.get(0).location));
-        //System.out.println(bm.validMove(activePenguins.get(0), new int[]{2,7,8}, new int[]{1,-1,0}));
-
-
-    }
+    //public ArrayList<Integer> occupiedIndexes = new ArrayList<>();
 
     public void addPenguins(Penguin p) {
         activePenguins.add(p);
-    }
-
-    //NOTE: TESTING METHOD
-    //Used to test the setStartSpots method
-    public List<Integer> numbers() {
-
-        List<Integer> fishTiles = new ArrayList<>();
-        fishTiles.clear();
-        for (int i = 0; i < 60; i++) fishTiles.add(1);
-        /*for (int i = 0; i < 30; i++) fishTiles.add(1);
-        for (int i = 0; i < 20; i++) fishTiles.add(2);
-        for (int i = 0; i < 10; i++) fishTiles.add(3);
-        Collections.shuffle(fishTiles);*/
-        return fishTiles;
     }
 
     public void setStartSpots(List<Integer> fishTiles) {
@@ -219,7 +151,15 @@ public class BoardAndMovement {
     }
 
     public Penguin penguinPresent(int index) {
-        Optional<Penguin> pen = activePenguins.stream().filter(Objects::nonNull).filter(a -> a.location == activeSpots.get(index)).findFirst();
+        Optional<Penguin> pen = activePenguins.stream().
+                filter(Objects::nonNull).filter(a -> a.location == activeSpots.get(index)).findFirst();
         return pen.orElse(null);
+
+        //ERROR HERE ^
+        //activeSpots set to null when penguin is placed there
+        //Rework to only set to null after penguin leaves or something
+
+
+        //return null;
     }
 }
