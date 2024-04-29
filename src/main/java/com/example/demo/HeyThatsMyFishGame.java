@@ -207,9 +207,6 @@ public class HeyThatsMyFishGame extends Application {
                     //System.out.println("\timageView new: " + imageView.getImage());
                     success = true;
                 }
-                if(numPlayers==1){
-
-                }
                 event.setDropCompleted(success);
                 event.consume();
             }
@@ -314,6 +311,7 @@ public class HeyThatsMyFishGame extends Application {
                                 button.setGraphic(aiPeng.getImageView());
                                 int fish = fishScores.get(fishTile[3]);
                                 opponentScore += fish;
+
                             } else {
                                 System.out.println("Error: could not find value of " + Arrays.toString(fishTile));
                                 return;
