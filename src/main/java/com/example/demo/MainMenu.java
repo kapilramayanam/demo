@@ -11,6 +11,7 @@ import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.image.Image;
+import javafx.scene.media.AudioClip;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -40,6 +41,13 @@ public class MainMenu extends Application {
             game.setupGame(2);
             primaryStage.hide();
         });
+
+        // Background setup
+        Image backgroundImage = new Image(getClass().getResourceAsStream("/bg.JPEG"));
+        BackgroundImage bgImage = new BackgroundImage(backgroundImage,
+                BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
+        menuBox.setBackground(new Background(bgImage));
 
         // Background setup
         Image backgroundImage = new Image(getClass().getResourceAsStream("/bg.JPEG"));

@@ -24,6 +24,7 @@ public class Penguin implements Observer{
         return image;
     }
     /*//If a penguin is completely isolated, returns true. Else, returns false
+    //If a penguin is completely isolated, returns true. Else, returns false
     public boolean penguinIsolation() {
         int[] desired = new int[3];
         for(int[] i : directions) {

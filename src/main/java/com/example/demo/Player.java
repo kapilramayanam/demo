@@ -60,6 +60,11 @@ public class Player implements Subject {
         return removedPenguins;
     }
 
+    public ArrayList<Penguin> getPenguins(){return penguins;}
+
+    public void removePenguin(Penguin p) {
+        penguins.remove(p);
+    }
     @Override
     public void register(Observer obj) {
         if(obj == null) throw new NullPointerException("Null Observer");
