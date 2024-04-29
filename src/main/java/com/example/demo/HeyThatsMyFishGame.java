@@ -79,11 +79,13 @@ public class HeyThatsMyFishGame extends Application {
         HBox penguinScreen = createPenguinDisplay();
         penguinScreen.setAlignment(Pos.TOP_LEFT);
         root.getChildren().add(penguinScreen); // Optionally manage penguins based on players
-        VBox pengAndScores = new VBox();
+        HBox pengAndScores = new HBox();
         pengAndScores.getChildren().add(penguinScreen);
         VBox scoreScreen = createScoreBoardDisplay();
+        scoreScreen.setAlignment(Pos.TOP_RIGHT);
         pengAndScores.getChildren().add(scoreScreen);
-        pengAndScores.setAlignment(Pos.TOP_RIGHT);
+        pengAndScores.setSpacing(50);
+
         HBox.setHgrow(pengAndScores,Priority.ALWAYS);
         root.getChildren().add(pengAndScores);
         createGameTiles();
@@ -101,6 +103,13 @@ public class HeyThatsMyFishGame extends Application {
         VBox scores = new VBox(2);
         playerOneScore = new TextField("Player 1: " + playerScore);
         playerTwoScore = new TextField("Player 2: " + opponentScore);
+        //playerOneScore.setVisible(false);
+        //playerTwoScore.setVisible(false);
+        //playerOneScore.setPrefWidth(50);
+        //playerTwoScore.setPrefWidth(50);
+
+
+
         scores.getChildren().addAll(playerOneScore, playerTwoScore);
         return scores;
     }
@@ -341,6 +350,10 @@ public class HeyThatsMyFishGame extends Application {
                         (ai != null && ai.getPenguins().size() == 4)){
                     allPlaced = true;
                 }
+                if(allPlaced) {
+                    playerOneScore.setVisible(true);
+                    playerTwoScore.setVisible(true);
+                }
                 event.setDropCompleted(success);
                 event.consume();
             }
@@ -381,7 +394,7 @@ public class HeyThatsMyFishGame extends Application {
                         tileButton.setGraphic(penguin.getImageView());
                         selected = null;
                         postMoveCheck(fishTileButtons);
-                        if(numPlayers == 1) {
+                        if(numPlayers == 1 && !ai.getPenguins().isEmpty()) {
                             AIMove();
                         }
                         //Checks if there are any turns left to take
@@ -439,7 +452,6 @@ public class HeyThatsMyFishGame extends Application {
         Random rand = new Random();
         Penguin aiPenguin = ai.getPenguins().get(rand.nextInt(0, ai.getPenguins().size()));
         int[] location  = ai.randomMove(aiPenguin);
-        turn++;
         final int tileIndex = bm.activeSpots.indexOf(location);
         if(tileIndex != -1) {
             System.out.println("Main: AI tileID chosen: " + tileIndex);
@@ -463,6 +475,8 @@ public class HeyThatsMyFishGame extends Application {
                 playerTwoScore.setText("Player 2: " + opponentScore);
             }
         }
+
+        turn++;
     }
 
     Penguin movePenguin(int fishID) {
@@ -584,7 +598,7 @@ private static final double HEX_SIZE = 50;
              public TileButton(HexTile hex, ImageView imageView, int fishID){
                             ImageView buttonView = new ImageView();
                                             buttonView.setImage(fishImage);
-
+             new TileButton(new HexTile(HEXakdfj), new Image
 
 */
         System.out.println("\t\t~~~~~Removal check complete~~~~~");
