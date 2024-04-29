@@ -340,8 +340,8 @@ public class HeyThatsMyFishGame extends Application {
                             }else{
                                 opponentScore += fish;
                             }
-                            playerOneScore.setText("Player Score: " + playerScore);
-                            playerTwoScore.setText("Player Score: " + opponentScore);
+                            playerOneScore.setText("Player 1: " + playerScore);
+                            playerTwoScore.setText("Player 2: " + opponentScore);
                         }
                     }
                     success = true;
@@ -453,7 +453,7 @@ public class HeyThatsMyFishGame extends Application {
             if(location.length >= 4){
                 int fishScore = location[3];
                 opponentScore += fishScore;
-                playerTwoScore.setText("Player Score: " + opponentScore);
+                playerTwoScore.setText("Player 2: " + opponentScore);
             }
         }
         return new Pair<>(bm.activeSpots.indexOf(location),aiPenguin);
@@ -484,8 +484,18 @@ public class HeyThatsMyFishGame extends Application {
                     System.out.println(++turn);
                     if(selected.location.length >= 4){
                         int fishScore = selected.location[3];
-                        playerScore += fishScore;
-                        playerOneScore.setText("Player Score: " + playerScore);
+                        if(numPlayers==1) {
+                            playerScore += fishScore;
+                            playerOneScore.setText("Player 1: " + playerScore);
+                        }else{
+                            if(turn % 2 == 0){
+                                playerScore += fishScore;
+                                playerOneScore.setText("Player 2: " + playerScore);
+                            }else{
+                                opponentScore += fishScore;
+                                playerTwoScore.setText("Player 1: " + opponentScore);
+                            }
+                        }
                     }
                     return selected;
                 }
