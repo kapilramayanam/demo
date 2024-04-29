@@ -4,7 +4,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Player implements Subject{
+public class Player implements Subject {
     private static int score;
     private Subject subject;
     protected ArrayList<Penguin> penguins;
@@ -34,6 +34,7 @@ public class Player implements Subject{
 
     //If a penguin is completely isolated, returns true. Else, returns false
     public ArrayList<Penguin> penguinIsolation() {
+        if(penguins.isEmpty()){return penguins;}
         int[] desired = new int[3];
         final int[][] directions = penguins.get(0).directions;
         ArrayList<Penguin> removedPenguins = new ArrayList<>();

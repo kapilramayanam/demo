@@ -52,6 +52,7 @@ public class HeyThatsMyFishGame extends Application {
     private ArrayList<Image> redPenguins = new ArrayList<>();
     private ImageView imageView = new ImageView();
     private boolean allPlaced = false;
+
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -394,21 +395,27 @@ public class HeyThatsMyFishGame extends Application {
                         selected = null;
                         postMoveCheck(fishTileButtons);
                         if(numPlayers == 1) {
-                            Pair<Integer,Penguin> tile = AIMove();
-                            System.out.println("Pair obtained");
-                            final int tileIndex = tile.getKey();
-                            Penguin aiPenguin = tile.getValue();
-                            if(tileIndex != -1) {
-                                System.out.println("\ttileID: " + tileIndex);
-                                System.out.println("\tPenguin: " + aiPenguin);
-                                TileButton aiButton = fishTileButtons.get(tileIndex);
-                                System.out.println(aiPenguin.setLocation(bm.activeSpots.get(tileIndex)));
-                                aiButton.setGraphic(aiPenguin.getImageView());
-                                System.out.println("Graphic set");
-                                postMoveCheck(fishTileButtons);
-                            } else {
-                                System.out.println("Penguin: " + aiPenguin + " or tile " + tileIndex + " not found");
+                            AIMove();
+                        }
+                        //Checks if there are any turns left to take
+                        if(playerOne.getPenguins().isEmpty() &&
+                                ((numPlayers == 2 && playerTwo.getPenguins().isEmpty())
+                                        || (numPlayers == 1 && ai.getPenguins().isEmpty()))) {
+                            //GAME OVER :)
+                            System.out.println("Game over!");
+                        } else if(playerOne.getPenguins().isEmpty() && numPlayers == 1) {
+                            //AI looped
+                            while(!ai.getPenguins().isEmpty()) {
+                                AIMove();
                             }
+                            System.out.println("Game over!");
+                        } else if(playerOne.getPenguins().isEmpty() && numPlayers == 2) {
+                            //PlayerTwo looped
+                            //turn+=2;
+                        } else if((numPlayers == 2 && playerTwo.getPenguins().isEmpty())
+                                || (numPlayers == 1 && ai.getPenguins().isEmpty())){
+                            //PlayerOne looped
+                            //turn+=2;
                         }
                     }
                 });
@@ -440,12 +447,28 @@ public class HeyThatsMyFishGame extends Application {
         bm.setStartSpots(fishTiles);
     }
 
-    Pair<Integer,Penguin> AIMove(){
+
+    void AIMove(){
         Random rand = new Random();
         Penguin aiPenguin = ai.getPenguins().get(rand.nextInt(0, ai.getPenguins().size()));
         int[] location  = ai.randomMove(aiPenguin);
         turn++;
-        return new Pair<>(bm.activeSpots.indexOf(location),aiPenguin);
+        //Pair<Integer,Penguin> tile = new Pair<>(bm.activeSpots.indexOf(location),aiPenguin);
+        System.out.println("Pair obtained");
+        final int tileIndex = bm.activeSpots.indexOf(location);
+        //Penguin aiPenguin = tile.getValue();
+        if(tileIndex != -1) {
+            System.out.println("\ttileID: " + tileIndex);
+            System.out.println("\tPenguin: " + aiPenguin);
+            TileButton aiButton = fishTileButtons.get(tileIndex);
+            System.out.println(aiPenguin.setLocation(bm.activeSpots.get(tileIndex)));
+            aiButton.setGraphic(aiPenguin.getImageView());
+            System.out.println("Graphic set");
+            postMoveCheck(fishTileButtons);
+            //System.out.println("Turn after move: " + turn);
+        } else {
+            System.out.println("Penguin: " + aiPenguin + " or tile " + tileIndex + " not found");
+        }
     }
 
     Penguin movePenguin(int fishID) {
@@ -457,13 +480,14 @@ public class HeyThatsMyFishGame extends Application {
         Penguin validate = bm.penguinPresent(fishID);
         System.out.println("Penguin present: " + validate);
         if(!(selected == null && validate == null)) {
-            if (validate != null &&
+            if(playerOne.getPenguins().isEmpty() || ((numPlayers == 2 && playerTwo.getPenguins().isEmpty()) || (numPlayers == 1 && ai.getPenguins().isEmpty()))){}
+            else if (validate != null &&
                     ((turn % 2 == 1 && redPenguins.stream().anyMatch(a -> a.equals(validate.getImageView().getImage()))) ||
                             (turn % 2 == 0 && bluePenguins.stream().anyMatch(a -> a.equals(validate.getImageView().getImage()))))) {
                 System.out.println(validate.getImageView().getImage() + " is not your penguin player " + turn%2);
                 for (Image image : bluePenguins) {System.out.println("\t" + image);}
                 return null;
-            } else if (validate != null) {
+            } if (validate != null) {
                 System.out.println("Penguin selected");
                 selected = validate;
                 return null;
@@ -485,6 +509,7 @@ public class HeyThatsMyFishGame extends Application {
         return null;
     }
 
+    //Play tested and error fixed thanks to Emerson Schultz :)
     void postMoveCheck(List<TileButton> buttons) {
         ArrayList<Integer> removedLocations = new ArrayList<>();
         ArrayList<Penguin> removedPenguins = playerOne.penguinIsolation();
@@ -543,6 +568,18 @@ public class HeyThatsMyFishGame extends Application {
             }
         }
 
+        /*if(playerOne.getPenguins().isEmpty() &&
+                ((numPlayers == 2 && playerTwo.getPenguins().isEmpty())
+                        || (numPlayers == 1 && ai.getPenguins().isEmpty()))) {
+            //GAME OVER :)
+        } else if(playerOne.getPenguins().isEmpty() && numPlayers == 1) {
+            //AI looped
+        } else if(playerOne.getPenguins().isEmpty() && numPlayers == 2) {
+            //PlayerTwo looped
+        } else if((numPlayers == 2 && playerTwo.getPenguins().isEmpty())
+                || (numPlayers == 1 && ai.getPenguins().isEmpty())){
+            //PlayerOne looped
+        }*/
         //return removedLocations;
     }
 

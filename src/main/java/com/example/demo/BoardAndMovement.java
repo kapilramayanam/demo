@@ -144,8 +144,8 @@ public class BoardAndMovement {
 
                         //Add the space to the queue to see if it has any other spots that it can access
                         toVisit.add(Arrays.copyOf(nextSpace, nextSpace.length));
-                        Optional<Penguin> penPlace = activePenguins.stream().filter(Objects::nonNull).filter(a -> Arrays.equals(a.location, 0, 3, nextSpace, 0,3)).findFirst();
-                        penPlace.ifPresent(tempPenguins::remove); //Possible error location but unlikely
+                        //Optional<Penguin> penPlace = activePenguins.stream().filter(Objects::nonNull).filter(a -> Arrays.equals(a.location, 0, 3, nextSpace, 0,3)).findFirst();
+                        //penPlace.ifPresent(tempPenguins::remove); //Possible error location but unlikely
                         //Penguins don't set their activeSpot to null until after they've been moved
                     }
                 }
