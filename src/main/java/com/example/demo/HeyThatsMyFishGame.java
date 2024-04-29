@@ -23,8 +23,8 @@ import java.util.*;
 public class HeyThatsMyFishGame extends Application {
 
     private static final int NUM_ROWS = 8;
-    private static final double HEX_SIZE = 50;
-    private static final double BOARD_PADDING = 70;
+    private static final double HEX_SIZE = 70;
+    private static final double BOARD_PADDING = 90;
     private static final double GAP = 5;
     private static int numPlayers;
     private static int turn;
@@ -585,7 +585,7 @@ public class HeyThatsMyFishGame extends Application {
                     // Create an ImageView and set it as the graphic for the button
                     ImageView imageView = new ImageView(image);
                     imageView.setFitHeight(HEX_SIZE * 2); // Adjust size as necessary
-                    imageView.setFitWidth(HEX_SIZE*2);  // Adjust size as necessary
+                    imageView.setFitWidth(HEX_SIZE*5);  // Adjust size as necessary
                     imageView.setPreserveRatio(true);
 
                     buttons.get(i).setGraphic(imageView);
