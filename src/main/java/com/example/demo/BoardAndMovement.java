@@ -168,7 +168,7 @@ public class BoardAndMovement {
         } */
 
         for(Integer i : remove) {
-            System.out.println("Remove from BM: " + i);
+            System.out.println("\tBM: Remove requested: " + i);
         }
         return remove;
     }

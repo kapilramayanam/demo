@@ -55,7 +55,7 @@ public class Player implements Subject {
         //penguins.get(0).bm.activePenguins.removeAll(removedPenguins);
         //penguins.removeAll(removedPenguins);
         for(Penguin p : removedPenguins) {
-            System.out.println("Remove from player: " + Arrays.toString(p.location));
+            System.out.println("\tPlayer: Remove request: " + Arrays.toString(p.location));
         }
         return removedPenguins;
     }
