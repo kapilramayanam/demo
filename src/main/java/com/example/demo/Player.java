@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Player implements Subject{
     private static int score;
     private Subject subject;
-    private static ArrayList<Penguin> penguins;
+    protected ArrayList<Penguin> penguins;
     private static ArrayList<Observer> observers;
     private static boolean changed;
     private final Object MUTEX = new Object();
@@ -14,26 +14,25 @@ public class Player implements Subject{
         score = 0;
         penguins = new ArrayList<>();
     }
-    public Player(int score, ArrayList<Penguin> penguins){
-        this.score = score;
-        this.penguins = penguins;
-    }
 
-    public void setScore(int score){
-        this.score = score;
+    public void setScore(int scr){
+        score = scr;
     }
 
     public int getScore(){
-        return this.score;
+        return score;
     }
 
-    public void addPenguin(Penguin p) {
+    public void addPenguinPlayer(Penguin p) {
         penguins.add(p);
-        p.bm.addPenguins(p);
+        //p.bm.addPenguins(p);
     }
 
     public ArrayList<Penguin> getPenguins(){return penguins;}
 
+    public void removePenguin(Penguin p) {
+        penguins.remove(p);
+    }
     @Override
     public void register(Observer obj) {
         if(obj == null) throw new NullPointerException("Null Observer");

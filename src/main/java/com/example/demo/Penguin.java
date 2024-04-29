@@ -1,5 +1,7 @@
 package com.example.demo;
 
+import javafx.scene.image.ImageView;
+import javafx.scene.image.Image;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Objects;
@@ -12,10 +14,15 @@ public class Penguin implements Observer{
     final int[][] directions = {{0,-1,1},{0,1,-1},{-1,0,1},{1,0,-1},{1,-1,0},{-1,1,0}};
     private Subject topic;
     private int pengScore;
-    Penguin(BoardAndMovement bam) {
+    private ImageView image;
+    Penguin(BoardAndMovement bam, ImageView image) {
         bm = bam;
+        this.image = image;
     }
 
+    public ImageView getImageView() {
+        return image;
+    }
     //If a penguin is completely isolated, returns true. Else, returns false
     public boolean penguinIsolation() {
         int[] desired = new int[3];
@@ -45,6 +52,7 @@ public class Penguin implements Observer{
                 if(aSpot[3] == 1) {
                     location = newLocation;
                     bm.addPenguins(this);
+                    //bm.removeSpot(location); //NEW as of 4/28/24
                     return true;
                 }
             }
@@ -53,8 +61,7 @@ public class Penguin implements Observer{
             //Can be deleted once testing is complete
             Optional<int[]> b = bm.activeSpots.stream().filter(Objects::nonNull).filter(a -> Arrays.equals(a, 0, 3, newLocation, 0,3)).findFirst();
             if(b.isPresent()) {
-
-                System.out.println(Arrays.toString(b.get())+ " is occupied");
+                System.out.println(Arrays.toString(b.get())+ " is occupied or not 1-fish");
             } else {
                 System.out.println(Arrays.toString(newLocation) + " is missing");
             }
