@@ -32,6 +32,10 @@ public class AI extends Player{
     //PROBLEM 2 SOLVED?
     public int[] randomMove(Penguin p) {
         //Penguin p = getPenguins().get(rand.nextInt(0,getPenguins().size()));
+        /*if(p.penguinIsolation()){
+           return null;
+        }*/
+        System.out.println("\tAI: Penguin chosen: " + penguins.indexOf(p));
         if(p.penguinIsolation()){
             return null;
         }
@@ -43,6 +47,11 @@ public class AI extends Player{
                 possibleLocation[j] = p.location[j] + i[j];
             }
             if(p.bm.validMove(p, possibleLocation)) {
+                System.out.println("\tAI: Can move from " + Arrays.toString(p.location)
+                        + " to " + Arrays.toString(possibleLocation));
+                validArrayList.add(i);
+            } else {
+                System.out.println("\tAI: Cannot move from " + Arrays.toString(p.location) + " to " + Arrays.toString(possibleLocation));
                 validArrayList.add(i);
             } else {
                 System.out.println("Cannot move from " + Arrays.toString(p.location) + " to " + Arrays.toString(possibleLocation));
@@ -57,6 +66,9 @@ public class AI extends Player{
             possibleLocation[2] = p.location[2] + (direction[2]*max);
             if(!p.bm.validMove(p, possibleLocation)) {
                 if(max == 1)
+                    System.out.println("\tAI: Error: Cannot from " + Arrays.toString(p.location) +
+                            " to " + Arrays.toString(possibleLocation));
+                System.out.println("\tAI: Max: " + max + "\t\t" + Arrays.toString(possibleLocation));
                     System.out.println("Error: Cannot from " + Arrays.toString(p.location) +
                             " to " + Arrays.toString(possibleLocation));
                 System.out.println("Max: " + max + "\t" + Arrays.toString(possibleLocation));
@@ -75,6 +87,10 @@ public class AI extends Player{
                 continue;
             else if (Arrays.equals(is, 0,3, possibleLocation,0,3)) {
                 chosen = is;
+                System.out.println("\tAI: Found in activeSpots: " + Arrays.toString(chosen));
+                break;
+            } else if(p.bm.activeSpots.indexOf(is) == p.bm.activeSpots.size() - 1) {
+                System.out.println("\tAI: " + Arrays.toString(possibleLocation) + " not found");
                 System.out.println("Found in activeSpots: " + Arrays.toString(is));
                 break;
             } else if(p.bm.activeSpots.indexOf(is) == p.bm.activeSpots.size() - 1) {

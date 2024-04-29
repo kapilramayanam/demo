@@ -23,6 +23,7 @@ public class Penguin implements Observer{
     public ImageView getImageView() {
         return image;
     }
+    /*//If a penguin is completely isolated, returns true. Else, returns false
     //If a penguin is completely isolated, returns true. Else, returns false
     public boolean penguinIsolation() {
         int[] desired = new int[3];
@@ -35,7 +36,7 @@ public class Penguin implements Observer{
         }
         return true;
     }
-
+*/
     //Sets a new location and returns true if the move can be made
     //Returns false the move cannot be made
     public boolean setLocation(int[] newLocation) {
@@ -61,9 +62,9 @@ public class Penguin implements Observer{
             //Can be deleted once testing is complete
             Optional<int[]> b = bm.activeSpots.stream().filter(Objects::nonNull).filter(a -> Arrays.equals(a, 0, 3, newLocation, 0,3)).findFirst();
             if(b.isPresent()) {
-                System.out.println(Arrays.toString(b.get())+ " is occupied or not 1-fish");
+                System.out.println("\tPenguin: " + Arrays.toString(b.get())+ " is occupied or not 1-fish");
             } else {
-                System.out.println(Arrays.toString(newLocation) + " is missing");
+                System.out.println("\tPenguin: " + Arrays.toString(newLocation) + " is missing");
             }
 
             return false;
@@ -74,7 +75,7 @@ public class Penguin implements Observer{
             location = newLocation;
             return true;
         }
-        System.out.println(Arrays.toString(newLocation) + " is not a valid location");
+        System.out.println("\tPenguin: " + Arrays.toString(newLocation) + " is not a valid location");
         return false;
     }
 
