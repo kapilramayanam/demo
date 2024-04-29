@@ -32,7 +32,7 @@ public class AI extends Player{
     //PROBLEM 2 SOLVED?
     public int[] randomMove(Penguin p) {
         //Penguin p = getPenguins().get(rand.nextInt(0,getPenguins().size()));
-        if(penguins.isEmpty()){
+        if(penguins.isEmpty()) {
             return null;
         }
         System.out.println("\tAI: Penguin chosen: " + penguins.indexOf(p));
