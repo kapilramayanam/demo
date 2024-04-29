@@ -10,6 +10,9 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -18,6 +21,8 @@ import javafx.util.Pair;
 
 import java.io.InputStream;
 import java.util.*;
+
+import javafx.scene.layout.StackPane;
 
 
 public class HeyThatsMyFishGame extends Application {
@@ -359,6 +364,58 @@ public class HeyThatsMyFishGame extends Application {
 
     private void createGameTiles() {
         int fishID = 0;
+    private List<Integer> fishTiles = new ArrayList<>();
+    private Stage primaryStage;
+    private Pane root;
+    private Scene scene;
+
+    @Override
+    public void start(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+        this.root = new Pane();
+        this.scene = new Scene(root, 970, 1020);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    // Change this method to public to allow access from MainMenu
+    public void setupGame(int numPlayers) {
+        root.getChildren().clear();
+        initializeFishTiles();
+        createGameBoard(numPlayers);
+        primaryStage.show();
+    }
+
+    private void createGameBoard(int numPlayers) {
+        root.getChildren().add(createPenguinDisplay()); // Optionally manage penguins based on players
+        createGameTiles();
+    }
+
+    private HBox createPenguinDisplay() {
+        HBox penguinDisplay = new HBox(10);
+        penguinDisplay.setAlignment(Pos.CENTER);
+        addPenguins(penguinDisplay, "BluePeng", 4);
+        addPenguins(penguinDisplay, "RedPeng", 4);
+        return penguinDisplay;
+    }
+
+    private void addPenguins(HBox penguinDisplay, String baseFileName, int count) {
+        for (int i = 1; i <= count; i++) {
+            String imagePath = "/Pengs/" + baseFileName + i + ".jpg"; // Adjust the path as needed
+            InputStream imageStream = getClass().getResourceAsStream(imagePath);
+            if (imageStream == null) {
+                throw new RuntimeException("Cannot find resource: " + imagePath);
+            }
+            Image penguinImage = new Image(imageStream);
+            ImageView penguinView = new ImageView(penguinImage);
+            penguinView.setFitHeight(HEX_SIZE);
+            penguinView.setFitWidth(HEX_SIZE);
+            penguinDisplay.getChildren().add(penguinView);
+        }
+    }
+
+
+    private void createGameTiles() {
         for (int row = 0; row < NUM_ROWS; row++) {
             int numColsInRow = row % 2 == 0 ? 7 : 8;
             for (int col = 0; col < numColsInRow; col++) {
@@ -410,6 +467,9 @@ public class HeyThatsMyFishGame extends Application {
                 hex.setTranslateY(y);
                 root.getChildren().add(tileButton);
                 fishID += 1;
+                hex.setTranslateX(x);
+                hex.setTranslateY(y);
+                root.getChildren().add(hex);
             }
         }
     }
@@ -531,6 +591,8 @@ public class HeyThatsMyFishGame extends Application {
             this.fishID = newFishID;
         }
     }
+    }
+
     class HexTile extends StackPane {
         public HexTile(double size, int fishCount) {
             this.getChildren().add(createHexagonShape(size));
@@ -554,6 +616,7 @@ public class HeyThatsMyFishGame extends Application {
         private ImageView createFishImageView(int fishCount) {
             String imagePath = "/Fish" + fishCount + ".png";
             Image fishImage = new Image(getClass().getResourceAsStream(imagePath), HEX_SIZE / 4, HEX_SIZE / 4, true, true);
+            Image fishImage = new Image(getClass().getResourceAsStream(imagePath), HEX_SIZE / 0.5, HEX_SIZE / 0.5, true, true);
             ImageView imageView = new ImageView(fishImage);
             imageView.setPreserveRatio(true);
             return imageView;
@@ -563,4 +626,5 @@ public class HeyThatsMyFishGame extends Application {
     public static void main(String[] args) {
         launch(args);
     }
+}
 }
