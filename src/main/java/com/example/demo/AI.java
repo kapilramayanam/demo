@@ -32,9 +32,9 @@ public class AI extends Player{
     //PROBLEM 2 SOLVED?
     public int[] randomMove(Penguin p) {
         //Penguin p = getPenguins().get(rand.nextInt(0,getPenguins().size()));
-        if(p.penguinIsolation()){
-            return null;
-        }
+        /*if(p.penguinIsolation()){
+           return null;
+        }*/
         System.out.println("Penguin chosen: " + penguins.indexOf(p));
         ArrayList<int[]> validArrayList = new ArrayList<>();
         int[] possibleLocation = new int[3];
@@ -43,6 +43,8 @@ public class AI extends Player{
                 possibleLocation[j] = p.location[j] + i[j];
             }
             if(p.bm.validMove(p, possibleLocation)) {
+                System.out.println("Can move from " + Arrays.toString(p.location)
+                        + " to " + Arrays.toString(possibleLocation));
                 validArrayList.add(i);
             } else {
                 System.out.println("Cannot move from " + Arrays.toString(p.location) + " to " + Arrays.toString(possibleLocation));
@@ -75,7 +77,7 @@ public class AI extends Player{
                 continue;
             else if (Arrays.equals(is, 0,3, possibleLocation,0,3)) {
                 chosen = is;
-                System.out.println("Found in activeSpots: " + Arrays.toString(is));
+                System.out.println("Found in activeSpots: " + Arrays.toString(chosen));
                 break;
             } else if(p.bm.activeSpots.indexOf(is) == p.bm.activeSpots.size() - 1) {
                 System.out.println(Arrays.toString(possibleLocation) + " not found");

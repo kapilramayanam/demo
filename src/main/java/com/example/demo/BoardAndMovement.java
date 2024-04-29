@@ -106,24 +106,47 @@ public class BoardAndMovement {
     //TO DO: Test more and optimize space (time seems good enough)
     //TO DO: Check with activeSpots now null not removed
     //Tested 1 Worst case (8 penguins full board) (1 penguin full board), 1 cornered case (1 penguin), and 1 true isolated island (1 penguin)
-    public void checkForIsolation() {
+    public ArrayList<Integer> checkForIsolation() {
         ArrayList<Boolean> reachable = new ArrayList<>();
+        ArrayList<Integer> remove = new ArrayList<>();
         for (int i = 0; i < activeSpots.size(); i++) reachable.add(false);
         final int[][] directions = {{0,-1,1},{0,1,-1},{-1,0,1},{1,0,-1},{1,-1,0},{-1,1,0}};
         ArrayList<int[]> toVisit = new ArrayList<>();
         ArrayList<Penguin> tempPenguins = new ArrayList<>(activePenguins);
+
+        //While there are still penguins to examine
         while(!tempPenguins.isEmpty()) {
+            //Pop first penguin off the list
             Penguin p = tempPenguins.remove(0);
+
+            //Add its location to the list of items to visit
             toVisit.add(Arrays.copyOf(p.location, 3));
+
+            //While there are still spaces to visit
             while(!toVisit.isEmpty()) {
+
+                //Look at all the directions the penguin can go
                 for (int i = 0; i < directions.length; i++) {
+
+                    //Go one spot in that direction
                     int[] nextSpace = addAll(Arrays.copyOf(toVisit.get(0),3), directions[i]);
-                    Optional<int[]> accessedSpace = activeSpots.stream().filter(Objects::nonNull).filter(a -> Arrays.equals(a,0,3,nextSpace,0,3)).findFirst();
+
+                    //check activeSpots for a non-null matching location
+                    //if such a space exists, then set accessedSpace to activeSpots int[]
+                    Optional<int[]> accessedSpace = activeSpots.stream().filter(Objects::nonNull).
+                            filter(a -> Arrays.equals(a,0,3,nextSpace,0,3)).findFirst();
+
+                    //if there is such a spot and the spot has not yet been visited
                     if(accessedSpace.isPresent() && !reachable.get(activeSpots.indexOf(accessedSpace.get()))) {
+
+                        //Set the spot to reachable
                         reachable.set(activeSpots.indexOf(accessedSpace.get()), true);
+
+                        //Add the space to the queue to see if it has any other spots that it can access
                         toVisit.add(Arrays.copyOf(nextSpace, nextSpace.length));
                         Optional<Penguin> penPlace = activePenguins.stream().filter(Objects::nonNull).filter(a -> Arrays.equals(a.location, 0, 3, nextSpace, 0,3)).findFirst();
-                        penPlace.ifPresent(tempPenguins::remove);
+                        penPlace.ifPresent(tempPenguins::remove); //Possible error location but unlikely
+                        //Penguins don't set their activeSpot to null until after they've been moved
                     }
                 }
                 toVisit.remove(0);
@@ -132,7 +155,10 @@ public class BoardAndMovement {
         for(int i = 0; i < reachable.size(); i++){
             if(reachable.get(i))
                 continue;
-            activeSpots.set(i,null);
+            else {
+                //activeSpots.set(i,null);
+                remove.add(i);
+            }
         }
 //    removeIf(a -> !reachable.get(activeSpots.indexOf(a)));
         /* for (int i = reachable.size()-1; i >= 0; i--) {
@@ -141,6 +167,10 @@ public class BoardAndMovement {
             }
         } */
 
+        for(Integer i : remove) {
+            System.out.println("Remove from BM: " + i);
+        }
+        return remove;
     }
 
     private static int[] addAll(int[] main, int[] b) {
