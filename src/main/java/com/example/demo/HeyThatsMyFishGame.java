@@ -272,23 +272,9 @@ public class HeyThatsMyFishGame extends Application {
                             int fish = fishScores.get(fishTileID);
                             playerScore += fish;
                             playerOneScore.setText("Player 1: " + playerScore);
-                            playerTwoScore.setText("Player 2: " + opponentScore);
                         }
                         System.out.println("Main: Turn: " + (++turn));
-                        /*System.out.println("redPenguins: ");
-                        for(int i = 0; i < redPenguins.size(); i++) {
-                            System.out.print("\t" + redPenguins.get(i));
-                            if(ai.getPenguins().size() > i){
-                                System.out.println("\t" + ai.getPenguins().get(i).getImageView().getImage());
-                            } else {
-                                System.out.println("\t[null]");
-                            }
-                        }
-                        System.out.println("bluePenguins: ");
-                        for (Image bluePenguin : bluePenguins) {
-                            System.out.print("\t" + bluePenguin);
-                        }
-                        System.out.println();*/
+
                         if(ai.getPenguins().size() < 4) {
                             ImageView iv = new ImageView(redPenguins.get(ai.getPenguins().size()));
                             //System.out.println("Iv created");
@@ -309,8 +295,9 @@ public class HeyThatsMyFishGame extends Application {
 
                                 TileButton button = fishTileButtons.get(FISHID);
                                 button.setGraphic(aiPeng.getImageView());
-                                int fish = fishScores.get(fishTile[3]);
+                                int fish = bmSelected.get()[3];
                                 opponentScore += fish;
+                                playerTwoScore.setText("Player 2: " + opponentScore);
                             } else {
                                 System.out.println("Main: Error: could not find value of " + Arrays.toString(fishTile));
                                 return;
@@ -337,8 +324,8 @@ public class HeyThatsMyFishGame extends Application {
                             }else{
                                 opponentScore += fish;
                             }
-                            playerOneScore.setText("Player Score: " + playerScore);
-                            playerTwoScore.setText("Player Score: " + opponentScore);
+                            playerOneScore.setText("Player 1: " + playerScore);
+                            playerTwoScore.setText("Player 2: " + opponentScore);
                         }
                     }
                     success = true;
@@ -466,6 +453,16 @@ public class HeyThatsMyFishGame extends Application {
         } else {
             System.out.println("Main: Penguin (" + aiPenguin + ") or tile (" + tileIndex + ") not found");
         }
+
+
+        //NOTE: GAVIN'S SCORE ADDITION
+        if(location != null){
+            if(location.length >= 4){
+                int fishScore = location[3];
+                opponentScore += fishScore;
+                playerTwoScore.setText("Player 2: " + opponentScore);
+            }
+        }
     }
 
     Penguin movePenguin(int fishID) {
@@ -494,7 +491,21 @@ public class HeyThatsMyFishGame extends Application {
                 if (selected.setLocation(bm.activeSpots.get(fishID))) {
                     System.out.println("Main: Moved penguin at " + Arrays.toString(old) +
                             " to " + Arrays.toString(selected.location));
+
+                    //NOTE: GAVIN'S SCORE ADDITION
+                    if(selected.location.length >= 4){
+                        int fishScore = selected.location[3];
+                        if(turn %2 == 1) {
+                            playerScore += fishScore;
+                            playerOneScore.setText("Player 1: " + playerScore);
+                        } else {
+                            opponentScore += fishScore;
+                            playerTwoScore.setText("Player 2: " + opponentScore);
+                        }
+
+                    }
                     System.out.println("Main: Turn: " + (++turn));
+
                     return selected;
                 }
             }
@@ -563,9 +574,19 @@ public class HeyThatsMyFishGame extends Application {
                 //System.out.println("Removing " + i + " button graphic...");
                 bm.activeSpots.set(i,null);
                 buttons.get(i).setGraphic(null);
+                //buttons.get(i) = new TileButton();
             }
         }
+/*
+private static final double HEX_SIZE = 50;
+                 HexTile hex = new HexTile(HEX_SIZE, fishCount);
+                 (fishCount helps the directory to a png)
+             public TileButton(HexTile hex, ImageView imageView, int fishID){
+                            ImageView buttonView = new ImageView();
+                                            buttonView.setImage(fishImage);
 
+
+*/
         System.out.println("\t\t~~~~~Removal check complete~~~~~");
     }
 
