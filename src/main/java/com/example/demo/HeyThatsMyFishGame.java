@@ -24,7 +24,7 @@ public class HeyThatsMyFishGame extends Application {
 
     private static final int NUM_ROWS = 8;
     private static final double HEX_SIZE = 50;
-    private static final double BOARD_PADDING = 50;
+    private static final double BOARD_PADDING = 70;
     private static final double GAP = 5;
     private static int numPlayers;
     private static int turn;
@@ -57,7 +57,7 @@ public class HeyThatsMyFishGame extends Application {
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         this.root = new Pane();
-        this.scene = new Scene(root, 900, 800);
+        this.scene = new Scene(root, 1200, 800);
         primaryStage.setScene(scene);
         primaryStage.hide();
     }
@@ -568,14 +568,37 @@ public class HeyThatsMyFishGame extends Application {
         try {
             removedLocations.addAll(bm.checkForIsolation());
         } catch (Exception e) {System.out.println("Main: No islands.");}
+//
+//        if(!removedLocations.isEmpty()) {
+//            for(Integer i : removedLocations) {
+//                //System.out.println("Removing " + i + " button graphic...");
+//                bm.activeSpots.set(i,null);
+//                buttons.get(i).setGraphic(null);
+//                //buttons.get(i) = new TileButton();
+//            }
+//        }
 
-        if(!removedLocations.isEmpty()) {
-            for(Integer i : removedLocations) {
-                //System.out.println("Removing " + i + " button graphic...");
-                bm.activeSpots.set(i,null);
-                buttons.get(i).setGraphic(null);
-                //buttons.get(i) = new TileButton();
+        if(!removedLocations.isEmpty()){
+            Image image = new Image("/Water.PNG");
+            for (Integer i : removedLocations) {
+                if (i >= 0 && i < buttons.size() && i < bm.activeSpots.size()) {
+                    // Create an ImageView and set it as the graphic for the button
+                    ImageView imageView = new ImageView(image);
+                    imageView.setFitHeight(HEX_SIZE * 2); // Adjust size as necessary
+                    imageView.setFitWidth(HEX_SIZE*2);  // Adjust size as necessary
+                    imageView.setPreserveRatio(true);
+
+                    buttons.get(i).setGraphic(imageView);
+
+                    // Update the activeSpots array for this button, assuming the first element indicates activity
+                    int[] states = bm.activeSpots.get(i);
+                    if (states != null && states.length > 0) {
+                        states[0] = 1; // Assume 1 represents an 'active' state
+                        bm.activeSpots.set(i, states); // Update the list with the modified array
+                    }
+                }
             }
+
         }
 /*
 private static final double HEX_SIZE = 50;
