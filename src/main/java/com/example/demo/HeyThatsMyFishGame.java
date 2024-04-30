@@ -1,35 +1,43 @@
 package com.example.demo;
 
+
+import javafx.geometry.Insets;
+import javafx.scene.media.AudioClip;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.paint.Color;
+import javafx.geometry.Insets;
 import javafx.scene.control.TextField;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
+import javafx.scene.text.Font;
+
 import javafx.util.Pair;
 
+import java.awt.*;
 import java.io.InputStream;
 import java.util.*;
-
-import javafx.scene.layout.StackPane;
+import java.util.List;
 
 
 public class HeyThatsMyFishGame extends Application {
 
     private static final int NUM_ROWS = 8;
-    private static final double HEX_SIZE = 50;
+    private static final double HEX_SIZE = 40;
     private static final double BOARD_PADDING = 50;
+    private static final double PAIRING_VERTICAL = 80;
     private static final double GAP = 5;
     private static int numPlayers;
     private static int turn;
@@ -43,8 +51,8 @@ public class HeyThatsMyFishGame extends Application {
     private List<Integer> fishTiles = new ArrayList<>();
     private List<Integer> fishScores = new ArrayList<>();
     private List<TileButton> fishTileButtons = new ArrayList<>();
-    private TextField playerOneScore;
-    private TextField playerTwoScore;
+    private Label playerOneScore;
+    private Label playerTwoScore;
     private Stage primaryStage;
     private Pane root;
     private Scene scene;
@@ -56,14 +64,20 @@ public class HeyThatsMyFishGame extends Application {
     private ArrayList<Image> bluePenguins = new ArrayList<>();
     private ArrayList<Image> redPenguins = new ArrayList<>();
     private ImageView imageView = new ImageView();
+    private boolean allPlaced = false;
     private HBox currentPenguinDisplay;
+    Image backgroundImage = new Image(getClass().getResourceAsStream("/BigBackGround.jpg"));
+    BackgroundImage bgImage = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
+
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         this.root = new Pane();
-        this.scene = new Scene(root, 900, 800);
+        root.setBackground(new Background(bgImage));
+        this.scene = new Scene(root, 800, 800);
         primaryStage.setScene(scene);
         primaryStage.hide();
+
     }
 
     // Change this method to public to allow access from MainMenu
@@ -82,16 +96,20 @@ public class HeyThatsMyFishGame extends Application {
     private void createGameBoard(int numPlayers) {
         HBox penguinScreen = createPenguinDisplay();
         this.currentPenguinDisplay = penguinScreen;
+        HBox pengAndScores = new HBox();
         penguinScreen.setAlignment(Pos.TOP_LEFT);
-        root.getChildren().add(penguinScreen); // Optionally manage penguins based on players
-        VBox pengAndScores = new VBox();
-        pengAndScores.getChildren().add(penguinScreen);
+        //root.getChildren().add(penguinScreen); // Optionally manage penguins based on players
         VBox scoreScreen = createScoreBoardDisplay();
+        scoreScreen.setBackground(Background.fill(Color.DARKBLUE));
+        scoreScreen.setPadding(new Insets  (5,5,5,5));
         pengAndScores.getChildren().add(scoreScreen);
+        pengAndScores.getChildren().add(penguinScreen);
         pengAndScores.setAlignment(Pos.TOP_RIGHT);
         HBox.setHgrow(pengAndScores,Priority.ALWAYS);
         root.getChildren().add(pengAndScores);
         createGameTiles();
+
+
 
     }
 
@@ -104,8 +122,16 @@ public class HeyThatsMyFishGame extends Application {
 
     private VBox createScoreBoardDisplay() {
         VBox scores = new VBox(2);
-        playerOneScore = new TextField("Player 1: " + playerScore);
-        playerTwoScore = new TextField("Player 2: " + opponentScore);
+        playerOneScore = new Label("Player 1: " + playerScore);
+        playerTwoScore = new Label("Player 2: " + opponentScore);
+        Font font = new Font("Times New Roman", 16);
+        playerOneScore.setFont(font);
+        playerTwoScore.setFont(font);
+
+
+
+
+
         scores.getChildren().addAll(playerOneScore, playerTwoScore);
         return scores;
     }
@@ -116,11 +142,16 @@ public class HeyThatsMyFishGame extends Application {
         ArrayList<Image> pengChosen = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
             String imagePath = "/Pengs/" + baseFileName + i + ".jpg"; // Adjust the path as needed
+            String opponentPenImagePath = null;
+            if(imagePath == "BluePeng"){
+                opponentPenImagePath = "/Pengs/" + "RedPeng" + i + ".jpg";
+            }
             InputStream imageStream = getClass().getResourceAsStream(imagePath);
             if (imageStream == null) {
                 throw new RuntimeException("Cannot find resource: " + imagePath);
             }
             Image penguinImage = new Image(imageStream);
+
             pengChosen.add(penguinImage);
             ImageView penguinView = new ImageView(penguinImage);
             penguinView.setFitHeight(HEX_SIZE);
@@ -212,6 +243,7 @@ public class HeyThatsMyFishGame extends Application {
                     //System.out.println("\timageView new: " + imageView.getImage());
                     success = true;
                 }
+
                 event.setDropCompleted(success);
                 event.consume();
             }
@@ -219,7 +251,7 @@ public class HeyThatsMyFishGame extends Application {
         iv.setOnDragDone(new EventHandler <DragEvent>(){
             public void handle(DragEvent event){
                 if(event.getTransferMode() == TransferMode.MOVE){
-                    System.out.println("iv done: " + iv.getImage());
+                    //System.out.println("iv done: " + iv.getImage());
                     iv.setImage(null);
                 }
                 event.consume();
@@ -264,7 +296,8 @@ public class HeyThatsMyFishGame extends Application {
                         playerTwo.addPenguinPlayer(newPeng);
                     } else //Not correct penguin
                         return;
-
+                    AudioClip gameStartSound = new AudioClip(getClass().getResource("/Click.wav").toExternalForm());
+                    gameStartSound.play();
 
                     newPeng.getImageView().setFitWidth(buttonWidth);
                     newPeng.getImageView().setFitHeight(buttonHeight);
@@ -276,33 +309,18 @@ public class HeyThatsMyFishGame extends Application {
                             int fish = fishScores.get(fishTileID);
                             playerScore += fish;
                             playerOneScore.setText("Player 1: " + playerScore);
-                            playerTwoScore.setText("Player 2: " + opponentScore);
                         }
-                        System.out.println(++turn);
-                        System.out.println("redPenguins: ");
-                        for(int i = 0; i < redPenguins.size(); i++) {
-                            System.out.print("\t" + redPenguins.get(i));
-                            if(ai.getPenguins().size() > i){
-                                System.out.println("\t" + ai.getPenguins().get(i).getImageView().getImage());
-                            } else {
-                                System.out.println("\t[null]");
-                            }
-                        }
-                        System.out.println("bluePenguins: ");
-                        for (Image bluePenguin : bluePenguins) {
-                            System.out.print("\t" + bluePenguin);
-                        }
-                        System.out.println();
+                        System.out.println("Main: Turn: " + (++turn));
+
                         if(ai.getPenguins().size() < 4) {
                             ImageView iv = new ImageView(redPenguins.get(ai.getPenguins().size()));
-                            System.out.println("Iv created");
+                            //System.out.println("Iv created");
                             iv.setFitWidth(button.getWidth());
                             iv.setFitHeight(button.getHeight());
                             Penguin aiPeng = new Penguin(bm, iv);
-                            System.out.println("Penguin created");
-                            //movePenguin(ai.randomStart(aiPeng)); //UNNECESSARY: movePenguin handles checking for user clicks error
+                            //System.out.println("Penguin created");
                             int[] fishTile = ai.randomStart(aiPeng);
-                            System.out.println("fishTile obtained: " + Arrays.toString(fishTile));
+                            //System.out.println("fishTile obtained: " + Arrays.toString(fishTile));
 
                             Optional<int[]> bmSelected = bm.activeSpots.stream().filter(Objects::nonNull).
                                     filter(a -> Arrays.equals(a,fishTile)).findFirst();
@@ -310,15 +328,16 @@ public class HeyThatsMyFishGame extends Application {
                             if(bmSelected.isPresent()){
                                 final int FISHID = bm.activeSpots.indexOf(bmSelected.get());
                                 aiPeng.setLocation(fishTile);
-                                System.out.println("AI placed penguin at " + Arrays.toString(aiPeng.location));
+                                System.out.println("Main: AI placed penguin at " + Arrays.toString(aiPeng.location));
 
                                 TileButton button = fishTileButtons.get(FISHID);
                                 button.setGraphic(aiPeng.getImageView());
-                                int fish = fishScores.get(fishTile[3]);
+                                currentPenguinDisplay.getChildren().remove(4);
+                                int fish = bmSelected.get()[3];
                                 opponentScore += fish;
-
+                                playerTwoScore.setText("Player 2: " + opponentScore);
                             } else {
-                                System.out.println("Error: could not find value of " + Arrays.toString(fishTile));
+                                System.out.println("Main: Error: could not find value of " + Arrays.toString(fishTile));
                                 return;
                             }
 /*
@@ -349,12 +368,16 @@ public class HeyThatsMyFishGame extends Application {
                     }
                     success = true;
                     turn += 1;
-                    System.out.println("Turn: " + turn);
+                    System.out.println("Main: Turn: " + turn);
                     //System.out.println("You are now on turn: " + turn);
                 }
-
+                /*
                 for(Penguin p : bm.activePenguins) {
                     System.out.println("\t" + Arrays.toString(p.location));
+                }*/
+                if((playerTwo != null && playerTwo.getPenguins().size() == 4) ||
+                        (ai != null && ai.getPenguins().size() == 4)){
+                    allPlaced = true;
                 }
                 event.setDropCompleted(success);
                 event.consume();
@@ -362,60 +385,94 @@ public class HeyThatsMyFishGame extends Application {
         });
     }
 
+
+    void postMoveCheck(List<TileButton> buttons) {
+        System.out.println("\t\t~~~~~Move complete, check for removals~~~~~");
+        ArrayList<Integer> removedLocations = new ArrayList<>();
+        ArrayList<Penguin> removedPenguins = playerOne.penguinIsolation();
+        if(!removedPenguins.isEmpty()) {
+            //System.out.println("Main: Remove from playerOne: ");
+            for(Penguin p : removedPenguins) {
+                if(!bm.activeSpots.contains(p.location)) {
+                    System.out.println("Main: Error: Cannot find location " + Arrays.toString(p.location));
+                } else {
+                    //System.out.println("\t" + bm.activeSpots.indexOf(p.location));
+                    removedLocations.add(bm.activeSpots.indexOf(p.location));
+                    System.out.println("Main: Remove activePenguin at " + Arrays.toString(p.location) + ": " +
+                            bm.activePenguins.remove(p));
+                    System.out.println("Main: Remove playerOne at " + Arrays.toString(p.location) + ": " +
+                            playerOne.penguins.remove(p));
+                }
+            }
+        }
+        if(numPlayers == 1) {
+            removedPenguins = ai.penguinIsolation();
+        } else {
+            removedPenguins = playerTwo.penguinIsolation();
+        }if(!removedPenguins.isEmpty()) {
+            //System.out.println("Remove from playerTwo: ");
+            for(Penguin p : removedPenguins) {
+                if(!bm.activeSpots.contains(p.location)) {
+                    System.out.println("Main: Error: Cannot find location " + Arrays.toString(p.location));
+                } else {
+                    //System.out.println("\t" + bm.activeSpots.indexOf(p.location));
+                    removedLocations.add(bm.activeSpots.indexOf(p.location));
+                    if(numPlayers == 1) {
+                        System.out.println("Main: Remove activePenguin at " + Arrays.toString(p.location) + ": " +
+                                bm.activePenguins.remove(p));
+                        System.out.println("Main: Remove ai at " + Arrays.toString(p.location) + ": " +
+                                ai.penguins.remove(p));
+                    } else if(numPlayers == 2) {System.out.println("Main: Remove activePenguin at " + Arrays.toString(p.location) + ": " +
+                            bm.activePenguins.remove(p));
+                        System.out.println("Main: Remove playerTwo at " + Arrays.toString(p.location) + ": " +
+                                playerTwo.penguins.remove(p));
+                    }
+                }
+            }
+        }
+        try {
+            removedLocations.addAll(bm.checkForIsolation());
+        } catch (Exception e) {System.out.println("Main: No islands.");}
+        if(!removedLocations.isEmpty()){
+            Image image = new Image("/Water.PNG");
+            for (Integer i : removedLocations) {
+                //NOTE: POSSIBLE BREAK SPOT - removedLocations represents an index 0-59 in activeSpots
+                //Are buttons and activeSpots starting at different points?
+                if (i >= 0 && i < buttons.size() && i < bm.activeSpots.size()) {
+                    // Create an ImageView and set it as the graphic for the button
+                    ImageView imageView = new ImageView(image);
+                    imageView.setFitHeight(HEX_SIZE * 2); // Adjust size as necessary
+                    imageView.setFitWidth(HEX_SIZE*5);  // Adjust size as necessary
+                    imageView.setPreserveRatio(true);
+
+                    buttons.get(i).setGraphic(imageView);
+
+                    // Update the activeSpots array for this button, assuming the first element indicates activity
+                    int[] states = bm.activeSpots.get(i);
+                    if (states != null && states.length > 0) {
+                        states[0] = 1; // Assume 1 represents an 'active' state
+                        bm.activeSpots.set(i, null); // Update the list with the modified array
+                    }
+                }
+            }
+
+        }
+/*
+private static final double HEX_SIZE = 50;
+                 HexTile hex = new HexTile(HEX_SIZE, fishCount);
+                 (fishCount helps the directory to a png)
+             public TileButton(HexTile hex, ImageView imageView, int fishID){
+                            ImageView buttonView = new ImageView();
+                                            buttonView.setImage(fishImage);
+             new TileButton(new HexTile(HEXakdfj), new Image
+
+*/
+        System.out.println("\t\t~~~~~Removal check complete~~~~~");
+    }
+
     private void createGameTiles() {
         int fishID = 0;
-    private List<Integer> fishTiles = new ArrayList<>();
-    private Stage primaryStage;
-    private Pane root;
-    private Scene scene;
-
-    @Override
-    public void start(Stage primaryStage) {
-        this.primaryStage = primaryStage;
-        this.root = new Pane();
-        this.scene = new Scene(root, 970, 1020);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
-
-    // Change this method to public to allow access from MainMenu
-    public void setupGame(int numPlayers) {
-        root.getChildren().clear();
-        initializeFishTiles();
-        createGameBoard(numPlayers);
-        primaryStage.show();
-    }
-
-    private void createGameBoard(int numPlayers) {
-        root.getChildren().add(createPenguinDisplay()); // Optionally manage penguins based on players
-        createGameTiles();
-    }
-
-    private HBox createPenguinDisplay() {
-        HBox penguinDisplay = new HBox(10);
-        penguinDisplay.setAlignment(Pos.CENTER);
-        addPenguins(penguinDisplay, "BluePeng", 4);
-        addPenguins(penguinDisplay, "RedPeng", 4);
-        return penguinDisplay;
-    }
-
-    private void addPenguins(HBox penguinDisplay, String baseFileName, int count) {
-        for (int i = 1; i <= count; i++) {
-            String imagePath = "/Pengs/" + baseFileName + i + ".jpg"; // Adjust the path as needed
-            InputStream imageStream = getClass().getResourceAsStream(imagePath);
-            if (imageStream == null) {
-                throw new RuntimeException("Cannot find resource: " + imagePath);
-            }
-            Image penguinImage = new Image(imageStream);
-            ImageView penguinView = new ImageView(penguinImage);
-            penguinView.setFitHeight(HEX_SIZE);
-            penguinView.setFitWidth(HEX_SIZE);
-            penguinDisplay.getChildren().add(penguinView);
-        }
-    }
-
-
-    private void createGameTiles() {
+        int pairingVertical = 17;
         for (int row = 0; row < NUM_ROWS; row++) {
             int numColsInRow = row % 2 == 0 ? 7 : 8;
             for (int col = 0; col < numColsInRow; col++) {
@@ -427,8 +484,8 @@ public class HeyThatsMyFishGame extends Application {
                 //buttonView.setPreserveRatio(true);
                 HexTile hex = new HexTile(HEX_SIZE, fishCount);
                 double offsetX = (row % 2 == 0) ? (HEX_SIZE * 1.5) / 2 : 0;
-                double x = col * (HEX_SIZE * 1.90 + GAP) + offsetX + BOARD_PADDING;
-                double y = row * (HEX_SIZE * Math.sqrt(3) + GAP / 4) + BOARD_PADDING;
+                double x = col * (HEX_SIZE * 1.90 + GAP) + offsetX + BOARD_PADDING+20;
+                double y = row * (HEX_SIZE * Math.sqrt(3) + GAP / 4) + BOARD_PADDING+20 + pairingVertical;
                 TileButton tileButton = new TileButton(hex,buttonView,fishID);
                 //tileButton.setPrefSize(HEX_SIZE,HEX_SIZE);
                 tileButton.setLayoutX(x);
@@ -439,19 +496,44 @@ public class HeyThatsMyFishGame extends Application {
                 enableDragAndDropForButton(tileButton);
                 //if(fishCount == 1){
                 tileButton.setOnAction(e -> {
+                    System.out.println("Main: Clicked " + tileButton.getFishID() + "\t" + turn);
                     Penguin penguin = movePenguin(tileButton.getFishID());
                     if(penguin != null) {
                         tileButton.setGraphic(penguin.getImageView());
                         selected = null;
-                        if(numPlayers == 1) {
-                            Pair<Integer,Penguin> tile = AIMove();
-                            final int tileIndex = tile.getKey();
-                            Penguin aiPenguin = tile.getValue();
-                            if(tileIndex != -1) {
-                                TileButton aiButton = fishTileButtons.get(tileIndex);
-                                aiPenguin.setLocation(bm.activeSpots.get(tileIndex));
-                                aiButton.setGraphic(aiPenguin.getImageView());
-                            } ///TEST
+//                        if(numPlayers == 1) {
+//                            Pair<Integer,Penguin> tile = AIMove();
+//                            final int tileIndex = tile.getKey();
+//                            Penguin aiPenguin = tile.getValue();
+//                            if(tileIndex != -1) {
+//                                TileButton aiButton = fishTileButtons.get(tileIndex);
+//                                aiPenguin.setLocation(bm.activeSpots.get(tileIndex));
+//                                aiButton.setGraphic(aiPenguin.getImageView());
+//                            } ///TEST
+
+                        postMoveCheck(fishTileButtons);
+                        if(numPlayers == 1 && !ai.getPenguins().isEmpty()) {
+                            AIMove();
+                        }
+                        //Checks if there are any turns left to take
+                        if(playerOne.getPenguins().isEmpty() &&
+                                ((numPlayers == 2 && playerTwo.getPenguins().isEmpty())
+                                        || (numPlayers == 1 && ai.getPenguins().isEmpty()))) {
+                            //GAME OVER :)
+                            System.out.println("Game over!");
+                        } else if(playerOne.getPenguins().isEmpty() && numPlayers == 1) {
+                            //AI looped
+                            while(!ai.getPenguins().isEmpty()) {
+                                AIMove();
+                            }
+                            System.out.println("Game over!");
+                        } else if(playerOne.getPenguins().isEmpty() && numPlayers == 2) {
+                            //PlayerTwo looped
+                            //turn+=2;
+                        } else if((numPlayers == 2 && playerTwo.getPenguins().isEmpty())
+                                || (numPlayers == 1 && ai.getPenguins().isEmpty())){
+                            //PlayerOne looped
+                            //turn+=2;
                         }
                     }
                 });
@@ -467,10 +549,8 @@ public class HeyThatsMyFishGame extends Application {
                 hex.setTranslateY(y);
                 root.getChildren().add(tileButton);
                 fishID += 1;
-                hex.setTranslateX(x);
-                hex.setTranslateY(y);
-                root.getChildren().add(hex);
             }
+            pairingVertical += 17;
         }
     }
 
@@ -486,27 +566,28 @@ public class HeyThatsMyFishGame extends Application {
         bm.setStartSpots(fishTiles);
     }
 
-    Pair<Integer,Penguin> AIMove(){
+
+    void AIMove(){
         Random rand = new Random();
-        turn++;
-        boolean tempIsolationCheck = true;
-        Penguin aiPenguin = ai.getPenguins().get(rand.nextInt(ai.getPenguins().size())); //Choose penguin
+        Penguin aiPenguin = ai.getPenguins().get(rand.nextInt(0, ai.getPenguins().size()));
         int[] location  = ai.randomMove(aiPenguin);
-        if(location == null) {
-            //Remove visible part
-            ai.removePenguin(aiPenguin);
-            while (tempIsolationCheck && !ai.getPenguins().isEmpty()) {
-                aiPenguin = ai.getPenguins().get(rand.nextInt(ai.getPenguins().size()));
-                location = ai.randomMove(aiPenguin);
-                if (location == null) {
-                    //Remove visible part
-                    System.out.println("Removing isolated penguin " + ai.getPenguins().indexOf(aiPenguin));
-                    ai.removePenguin(aiPenguin);
-                } else {
-                    tempIsolationCheck = false;
-                }
-            }
+        //turn++;
+        final int tileIndex = bm.activeSpots.indexOf(location);
+        if(tileIndex != -1) {
+            System.out.println("Main: AI tileID chosen: " + tileIndex);
+            System.out.println("Main: AI Penguin chosen: " + aiPenguin);
+            TileButton aiButton = fishTileButtons.get(tileIndex);
+            System.out.println(aiPenguin.setLocation(bm.activeSpots.get(tileIndex)));
+            aiButton.setGraphic(aiPenguin.getImageView());
+            //System.out.println("Main: Graphic set");
+            postMoveCheck(fishTileButtons);
+            //System.out.println("Turn after move: " + turn);
+        } else {
+            System.out.println("Main: Penguin (" + aiPenguin + ") or tile (" + tileIndex + ") not found");
         }
+
+
+        //NOTE: GAVIN'S SCORE ADDITION
         if(location != null){
             if(location.length >= 4){
                 int fishScore = location[3];
@@ -514,59 +595,66 @@ public class HeyThatsMyFishGame extends Application {
                 playerTwoScore.setText("Player 2: " + opponentScore);
             }
         }
-        return new Pair<>(bm.activeSpots.indexOf(location),aiPenguin);
+
+        turn++;
     }
 
+
     Penguin movePenguin(int fishID) {
-        if((playerTwo != null && playerTwo.getPenguins().size() < 4)
-                || (ai != null && ai.getPenguins().size() < 4)) {return null;}
+//        /System.out.println("Enter movePenguin");
+        if(!allPlaced) {
+            System.out.println("Main: Not enough penguins laid");
+            return null;
+        }
         Penguin validate = bm.penguinPresent(fishID);
-        System.out.println("Penguin present: " + validate);
+        System.out.println("Main: Penguin present? " + validate);
         if(!(selected == null && validate == null)) {
-            if (validate != null &&
+            if(playerOne.getPenguins().isEmpty() || ((numPlayers == 2 && playerTwo.getPenguins().isEmpty()) || (numPlayers == 1 && ai.getPenguins().isEmpty()))){}
+            else if (validate != null &&
                     ((turn % 2 == 1 && redPenguins.stream().anyMatch(a -> a.equals(validate.getImageView().getImage()))) ||
                             (turn % 2 == 0 && bluePenguins.stream().anyMatch(a -> a.equals(validate.getImageView().getImage()))))) {
-                System.out.println(validate.getImageView().getImage() + " is not your penguin player " + turn%2);
-                for (Image image : bluePenguins) {System.out.println("\t" + image);}
+                System.out.println("Main: " + validate.getImageView().getImage() + " is not your penguin player " + turn%2);
+                //for (Image image : bluePenguins) {System.out.println("\t" + image);}
                 return null;
-            } else if (validate != null) {
-                System.out.println("Penguin selected");
+            } if (validate != null) {
+                System.out.println("Main: Penguin selected");
                 selected = validate;
                 return null;
             }
             else {
                 int[] old = selected.location;
+
                 if (selected.setLocation(bm.activeSpots.get(fishID))) {
-                    System.out.println("Moved penguin at " + Arrays.toString(old) +
+                    System.out.println("Main: Moved penguin at " + Arrays.toString(old) +
                             " to " + Arrays.toString(selected.location));
-                    System.out.println(++turn);
+                    AudioClip gameStartSound = new AudioClip(getClass().getResource("/Click.wav").toExternalForm());
+                    gameStartSound.play();
+
+                    //NOTE: GAVIN'S SCORE ADDITION
                     if(selected.location.length >= 4){
                         int fishScore = selected.location[3];
-                        if(numPlayers==1) {
+                        if(turn %2 == 1) {
                             playerScore += fishScore;
                             playerOneScore.setText("Player 1: " + playerScore);
-                        }else{
-                            if(turn % 2 == 0){
-                                playerScore += fishScore;
-                                playerOneScore.setText("Player 2: " + playerScore);
-                            }else{
-                                opponentScore += fishScore;
-                                playerTwoScore.setText("Player 1: " + opponentScore);
-                            }
+                        } else {
+                            opponentScore += fishScore;
+                            playerTwoScore.setText("Player 2: " + opponentScore);
                         }
+
                     }
+                    System.out.println("Main: Turn: " + (++turn));
+
                     return selected;
                 }
             }
         }
-
-        //TO DO: Move the image of the penguin to the new button and indicate a new turn
-        System.out.println(Arrays.toString(bm.activeSpots.get(fishID)) + " (" + bm.activeSpots.get(fishID) + ") is not a valid location");
-        for(Penguin p : bm.activePenguins) {
+        System.out.println("Main: " + Arrays.toString(bm.activeSpots.get(fishID)) + " (" + bm.activeSpots.get(fishID) + ") is not a valid location");
+        /*for(Penguin p : bm.activePenguins) {
             System.out.println("\t" + Arrays.toString(p.location) + "\t\t" + p.location);
-        }
+        }*/
         return null;
     }
+
     class TileButton extends Button{
         private HexTile hex;
         private ImageView imageView;
@@ -591,8 +679,6 @@ public class HeyThatsMyFishGame extends Application {
             this.fishID = newFishID;
         }
     }
-    }
-
     class HexTile extends StackPane {
         public HexTile(double size, int fishCount) {
             this.getChildren().add(createHexagonShape(size));
@@ -616,7 +702,6 @@ public class HeyThatsMyFishGame extends Application {
         private ImageView createFishImageView(int fishCount) {
             String imagePath = "/Fish" + fishCount + ".png";
             Image fishImage = new Image(getClass().getResourceAsStream(imagePath), HEX_SIZE / 4, HEX_SIZE / 4, true, true);
-            Image fishImage = new Image(getClass().getResourceAsStream(imagePath), HEX_SIZE / 0.5, HEX_SIZE / 0.5, true, true);
             ImageView imageView = new ImageView(fishImage);
             imageView.setPreserveRatio(true);
             return imageView;
@@ -626,5 +711,4 @@ public class HeyThatsMyFishGame extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-}
 }

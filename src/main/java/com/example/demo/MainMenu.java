@@ -33,25 +33,18 @@ public class MainMenu extends Application {
         this.game = new HeyThatsMyFishGame(); // Assuming no-args constructor or adjust as necessary
         game.start(new Stage()); // Start the game on a new stage or use primary stage as needed
 
-        onePlayerButton.setOnAction(e -> {
+        onePlayerButton.setOnAction(e ->{
             game.setupGame(1);
-            AudioClip gameStartSound = new AudioClip(getClass().getResource("/audio/GameStart.mp3").toExternalForm());
+            primaryStage.hide();
+            AudioClip gameStartSound = new AudioClip(getClass().getResource("/GameStart.mp3").toExternalForm());
             gameStartSound.play();
         });
         twoPlayerButton.setOnAction(e -> {
             game.setupGame(2);
-            AudioClip gameStartSound = new AudioClip(getClass().getResource("/audio/GameStart.mp3").toExternalForm());
+            primaryStage.hide();
+            AudioClip gameStartSound = new AudioClip(getClass().getResource("/GameStart.mp3").toExternalForm());
             gameStartSound.play();
         });
-        onePlayerButton.setOnAction(e -> game.setupGame(1));
-        twoPlayerButton.setOnAction(e -> game.setupGame(2));
-
-        // Background setup
-        Image backgroundImage = new Image(getClass().getResourceAsStream("/bg.JPEG"));
-        BackgroundImage bgImage = new BackgroundImage(backgroundImage,
-                BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
-                BackgroundSize.DEFAULT);
-        menuBox.setBackground(new Background(bgImage));
 
         // Background setup
         Image backgroundImage = new Image(getClass().getResourceAsStream("/bg.JPEG"));
