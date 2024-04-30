@@ -35,13 +35,9 @@ public class MainMenu extends Application {
 
         onePlayerButton.setOnAction(e -> {
             game.setupGame(1);
-            AudioClip gameStartSound = new AudioClip(getClass().getResource("/audio/GameStart.mp3").toExternalForm());
-            gameStartSound.play();
         });
         twoPlayerButton.setOnAction(e -> {
             game.setupGame(2);
-            AudioClip gameStartSound = new AudioClip(getClass().getResource("/audio/GameStart.mp3").toExternalForm());
-            gameStartSound.play();
         });
 
         // Background setup
