@@ -100,7 +100,7 @@ public class HeyThatsMyFishGame extends Application {
         penguinScreen.setAlignment(Pos.TOP_LEFT);
         //root.getChildren().add(penguinScreen); // Optionally manage penguins based on players
         VBox scoreScreen = createScoreBoardDisplay();
-        scoreScreen.setBackground(Background.fill(Color.DARKBLUE));
+        scoreScreen.setBackground(Background.fill(Color.DEEPPINK));
         scoreScreen.setPadding(new Insets  (5,5,5,5));
         pengAndScores.getChildren().add(scoreScreen);
         pengAndScores.getChildren().add(penguinScreen);
