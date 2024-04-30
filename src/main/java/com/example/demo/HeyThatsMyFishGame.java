@@ -5,6 +5,7 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
@@ -23,8 +24,9 @@ import java.util.*;
 public class HeyThatsMyFishGame extends Application {
 
     private static final int NUM_ROWS = 8;
-    private static final double HEX_SIZE = 50;
+    private static final double HEX_SIZE = 40;
     private static final double BOARD_PADDING = 50;
+    private static final double PAIRING_VERTICAL = 80;
     private static final double GAP = 5;
     private static int numPlayers;
     private static int turn;
@@ -38,8 +40,8 @@ public class HeyThatsMyFishGame extends Application {
     private List<Integer> fishTiles = new ArrayList<>();
     private List<Integer> fishScores = new ArrayList<>();
     private List<TileButton> fishTileButtons = new ArrayList<>();
-    private TextField playerOneScore;
-    private TextField playerTwoScore;
+    private Label playerOneScore;
+    private Label playerTwoScore;
     private Stage primaryStage;
     private Pane root;
     private Scene scene;
@@ -79,9 +81,9 @@ public class HeyThatsMyFishGame extends Application {
         this.currentPenguinDisplay = penguinScreen;
         penguinScreen.setAlignment(Pos.TOP_LEFT);
         root.getChildren().add(penguinScreen); // Optionally manage penguins based on players
-        VBox pengAndScores = new VBox();
+        HBox pengAndScores = new HBox();
         pengAndScores.getChildren().add(penguinScreen);
-        VBox scoreScreen = createScoreBoardDisplay();
+        HBox scoreScreen = createScoreBoardDisplay();
         pengAndScores.getChildren().add(scoreScreen);
         pengAndScores.setAlignment(Pos.TOP_RIGHT);
         HBox.setHgrow(pengAndScores,Priority.ALWAYS);
@@ -97,10 +99,10 @@ public class HeyThatsMyFishGame extends Application {
         return penguinDisplay;
     }
 
-    private VBox createScoreBoardDisplay() {
-        VBox scores = new VBox(2);
-        playerOneScore = new TextField("Player 1: " + playerScore);
-        playerTwoScore = new TextField("Player 2: " + opponentScore);
+    private HBox createScoreBoardDisplay() {
+        HBox scores = new HBox(2);
+        playerOneScore = new Label("Player 1: " + playerScore);
+        playerTwoScore = new Label("Player 2: " + opponentScore);
         scores.getChildren().addAll(playerOneScore, playerTwoScore);
         return scores;
     }
@@ -111,11 +113,16 @@ public class HeyThatsMyFishGame extends Application {
         ArrayList<Image> pengChosen = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
             String imagePath = "/Pengs/" + baseFileName + i + ".jpg"; // Adjust the path as needed
+            String opponentPenImagePath = null;
+            if(imagePath == "BluePeng"){
+                opponentPenImagePath = "/Pengs/" + "RedPeng" + i + ".jpg";
+            }
             InputStream imageStream = getClass().getResourceAsStream(imagePath);
             if (imageStream == null) {
                 throw new RuntimeException("Cannot find resource: " + imagePath);
             }
             Image penguinImage = new Image(imageStream);
+
             pengChosen.add(penguinImage);
             ImageView penguinView = new ImageView(penguinImage);
             penguinView.setFitHeight(HEX_SIZE);
@@ -206,6 +213,9 @@ public class HeyThatsMyFishGame extends Application {
                     imageView.setImage(db.getImage());
                     //System.out.println("\timageView new: " + imageView.getImage());
                     success = true;
+                }
+                if(numPlayers==1){
+
                 }
                 event.setDropCompleted(success);
                 event.consume();
@@ -309,9 +319,13 @@ public class HeyThatsMyFishGame extends Application {
 
                                 TileButton button = fishTileButtons.get(FISHID);
                                 button.setGraphic(aiPeng.getImageView());
+                                //aiPeng = null;
+                                //int currentSize = currentPenguinDisplay.getChildren().size()-1;
+                                currentPenguinDisplay.getChildren().remove(4);
+                                System.out.println("Current turn is: " + turn);
+                                System.out.println("Current length of list is: " + currentPenguinDisplay.getChildren().size());
                                 int fish = fishScores.get(fishTile[3]);
                                 opponentScore += fish;
-
                             } else {
                                 System.out.println("Error: could not find value of " + Arrays.toString(fishTile));
                                 return;
@@ -359,6 +373,7 @@ public class HeyThatsMyFishGame extends Application {
 
     private void createGameTiles() {
         int fishID = 0;
+        int pairingVertical = 17;
         for (int row = 0; row < NUM_ROWS; row++) {
             int numColsInRow = row % 2 == 0 ? 7 : 8;
             for (int col = 0; col < numColsInRow; col++) {
@@ -371,7 +386,7 @@ public class HeyThatsMyFishGame extends Application {
                 HexTile hex = new HexTile(HEX_SIZE, fishCount);
                 double offsetX = (row % 2 == 0) ? (HEX_SIZE * 1.5) / 2 : 0;
                 double x = col * (HEX_SIZE * 1.90 + GAP) + offsetX + BOARD_PADDING;
-                double y = row * (HEX_SIZE * Math.sqrt(3) + GAP / 4) + BOARD_PADDING;
+                double y = row * (HEX_SIZE * Math.sqrt(3) + GAP / 4) + BOARD_PADDING + pairingVertical;
                 TileButton tileButton = new TileButton(hex,buttonView,fishID);
                 //tileButton.setPrefSize(HEX_SIZE,HEX_SIZE);
                 tileButton.setLayoutX(x);
@@ -411,6 +426,7 @@ public class HeyThatsMyFishGame extends Application {
                 root.getChildren().add(tileButton);
                 fishID += 1;
             }
+            pairingVertical += 17;
         }
     }
 
