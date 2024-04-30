@@ -11,6 +11,7 @@ import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.image.Image;
+import javafx.scene.media.AudioClip;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -35,10 +36,14 @@ public class MainMenu extends Application {
         onePlayerButton.setOnAction(e ->{
             game.setupGame(1);
             primaryStage.hide();
+            AudioClip gameStartSound = new AudioClip(getClass().getResource("/GameStart.mp3").toExternalForm());
+            gameStartSound.play();
         });
         twoPlayerButton.setOnAction(e -> {
             game.setupGame(2);
             primaryStage.hide();
+            AudioClip gameStartSound = new AudioClip(getClass().getResource("/GameStart.mp3").toExternalForm());
+            gameStartSound.play();
         });
 
         // Background setup

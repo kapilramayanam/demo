@@ -1,11 +1,18 @@
 package com.example.demo;
 
+
+import javafx.geometry.Insets;
+import javafx.scene.media.AudioClip;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.paint.Color;
+import javafx.geometry.Insets;
 import javafx.scene.control.TextField;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
@@ -15,10 +22,14 @@ import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
+import javafx.scene.text.Font;
+
 import javafx.util.Pair;
 
+import java.awt.*;
 import java.io.InputStream;
 import java.util.*;
+import java.util.List;
 
 
 public class HeyThatsMyFishGame extends Application {
@@ -55,14 +66,18 @@ public class HeyThatsMyFishGame extends Application {
     private ImageView imageView = new ImageView();
     private boolean allPlaced = false;
     private HBox currentPenguinDisplay;
+    Image backgroundImage = new Image(getClass().getResourceAsStream("/BigBackGround.jpg"));
+    BackgroundImage bgImage = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
 
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         this.root = new Pane();
-        this.scene = new Scene(root, 1200, 800);
+        root.setBackground(new Background(bgImage));
+        this.scene = new Scene(root, 800, 800);
         primaryStage.setScene(scene);
         primaryStage.hide();
+
     }
 
     // Change this method to public to allow access from MainMenu
@@ -85,12 +100,16 @@ public class HeyThatsMyFishGame extends Application {
         penguinScreen.setAlignment(Pos.TOP_LEFT);
         //root.getChildren().add(penguinScreen); // Optionally manage penguins based on players
         VBox scoreScreen = createScoreBoardDisplay();
+        scoreScreen.setBackground(Background.fill(Color.DARKBLUE));
+        scoreScreen.setPadding(new Insets  (5,5,5,5));
         pengAndScores.getChildren().add(scoreScreen);
         pengAndScores.getChildren().add(penguinScreen);
         pengAndScores.setAlignment(Pos.TOP_RIGHT);
         HBox.setHgrow(pengAndScores,Priority.ALWAYS);
         root.getChildren().add(pengAndScores);
         createGameTiles();
+
+
 
     }
 
@@ -105,6 +124,14 @@ public class HeyThatsMyFishGame extends Application {
         VBox scores = new VBox(2);
         playerOneScore = new Label("Player 1: " + playerScore);
         playerTwoScore = new Label("Player 2: " + opponentScore);
+        Font font = new Font("Times New Roman", 16);
+        playerOneScore.setFont(font);
+        playerTwoScore.setFont(font);
+
+
+
+
+
         scores.getChildren().addAll(playerOneScore, playerTwoScore);
         return scores;
     }
@@ -269,7 +296,8 @@ public class HeyThatsMyFishGame extends Application {
                         playerTwo.addPenguinPlayer(newPeng);
                     } else //Not correct penguin
                         return;
-
+                    AudioClip gameStartSound = new AudioClip(getClass().getResource("/Click.wav").toExternalForm());
+                    gameStartSound.play();
 
                     newPeng.getImageView().setFitWidth(buttonWidth);
                     newPeng.getImageView().setFitHeight(buttonHeight);
@@ -456,8 +484,8 @@ private static final double HEX_SIZE = 50;
                 //buttonView.setPreserveRatio(true);
                 HexTile hex = new HexTile(HEX_SIZE, fishCount);
                 double offsetX = (row % 2 == 0) ? (HEX_SIZE * 1.5) / 2 : 0;
-                double x = col * (HEX_SIZE * 1.90 + GAP) + offsetX + BOARD_PADDING;
-                double y = row * (HEX_SIZE * Math.sqrt(3) + GAP / 4) + BOARD_PADDING + pairingVertical;
+                double x = col * (HEX_SIZE * 1.90 + GAP) + offsetX + BOARD_PADDING+20;
+                double y = row * (HEX_SIZE * Math.sqrt(3) + GAP / 4) + BOARD_PADDING+20 + pairingVertical;
                 TileButton tileButton = new TileButton(hex,buttonView,fishID);
                 //tileButton.setPrefSize(HEX_SIZE,HEX_SIZE);
                 tileButton.setLayoutX(x);
@@ -595,9 +623,12 @@ private static final double HEX_SIZE = 50;
             }
             else {
                 int[] old = selected.location;
+
                 if (selected.setLocation(bm.activeSpots.get(fishID))) {
                     System.out.println("Main: Moved penguin at " + Arrays.toString(old) +
                             " to " + Arrays.toString(selected.location));
+                    AudioClip gameStartSound = new AudioClip(getClass().getResource("/Click.wav").toExternalForm());
+                    gameStartSound.play();
 
                     //NOTE: GAVIN'S SCORE ADDITION
                     if(selected.location.length >= 4){
