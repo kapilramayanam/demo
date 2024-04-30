@@ -14,9 +14,6 @@ import javafx.scene.image.Image;
 import javafx.scene.media.AudioClip;
 import javafx.stage.Stage;
 
-import java.net.URL;
-import java.util.Objects;
-
 public class MainMenu extends Application {
 
     private HeyThatsMyFishGame game; // Add a reference to the game instance
@@ -35,9 +32,13 @@ public class MainMenu extends Application {
 
         onePlayerButton.setOnAction(e -> {
             game.setupGame(1);
+            AudioClip gameStartSound = new AudioClip(getClass().getResource("/audio/GameStart.mp3").toExternalForm());
+            gameStartSound.play();
         });
         twoPlayerButton.setOnAction(e -> {
             game.setupGame(2);
+            AudioClip gameStartSound = new AudioClip(getClass().getResource("/audio/GameStart.mp3").toExternalForm());
+            gameStartSound.play();
         });
 
         // Background setup

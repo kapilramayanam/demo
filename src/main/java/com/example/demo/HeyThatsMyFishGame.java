@@ -2,6 +2,7 @@ package com.example.demo;
 
 import javafx.application.Application;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
@@ -9,6 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
+import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.geometry.Pos;
@@ -104,6 +106,8 @@ public class HeyThatsMyFishGame extends Application {
         playerOneScore = new Label("Player 1: " + playerScore);
         playerTwoScore = new Label("Player 2: " + opponentScore);
         scores.getChildren().addAll(playerOneScore, playerTwoScore);
+        //BackgroundFill fill = new BackgroundFill(Color.LIGHTBLUE,CornerRadii.EMPTY, Insets.EMPTY);
+        //scores.setBackground(new Background(fill));
         return scores;
     }
 
@@ -270,7 +274,8 @@ public class HeyThatsMyFishGame extends Application {
                     } else //Not correct penguin
                         return;
 
-
+                    AudioClip gameStartSound = new AudioClip(getClass().getResource("/audio/Click.wav").toExternalForm());
+                    gameStartSound.play();
                     newPeng.getImageView().setFitWidth(buttonWidth);
                     newPeng.getImageView().setFitHeight(buttonHeight);
                     button.setGraphic(newPeng.getImageView());
@@ -493,6 +498,8 @@ public class HeyThatsMyFishGame extends Application {
             else {
                 int[] old = selected.location;
                 if (selected.setLocation(bm.activeSpots.get(fishID))) {
+                    AudioClip gameStartSound = new AudioClip(getClass().getResource("/audio/Click.wav").toExternalForm());
+                    gameStartSound.play();
                     System.out.println("Moved penguin at " + Arrays.toString(old) +
                             " to " + Arrays.toString(selected.location));
                     System.out.println(++turn);
