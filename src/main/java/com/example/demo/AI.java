@@ -3,7 +3,6 @@ import java.util.Random;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.Objects;
 
 public class AI extends Player{
@@ -14,7 +13,7 @@ public class AI extends Player{
         List<int[]> allValids;
         penguins.add(p);
         allValids = p.bm.activeSpots.stream().filter(Objects::nonNull).filter(a -> Arrays.equals(a, 3,4,new int[]{0,0,0,1},3,4)).toList();
-        //allValids = new ArrayList<>(allValids);
+
         for (Penguin i : p.bm.activePenguins) {
             allValids = allValids.stream().filter(a -> !Arrays.equals(a, i.location)).toList();
         }
@@ -22,16 +21,7 @@ public class AI extends Player{
         return allValids.get(rand.nextInt(0,allValids.size()));
     }
 
-
-
-    //TWO PROBLEMS:
-    //1) Button thinks it needs to set the background as the AI image. It does not appear that the penguin is actually there backend
-    //2) Max movement still isn't returning something right. It seems to accurately calculate the max distance,
-    //But doesn't know how to convert it to the usable location
-
-    //PROBLEM 2 SOLVED?
     public int[] randomMove(Penguin p) {
-        //Penguin p = getPenguins().get(rand.nextInt(0,getPenguins().size()));
         if(penguins.isEmpty()) {
             return null;
         }
@@ -50,8 +40,10 @@ public class AI extends Player{
                 System.out.println("\tAI: Cannot move from " + Arrays.toString(p.location) + " to " + Arrays.toString(possibleLocation));
             }
         }
-        //if(validArrayList.isEmpty()) {return null;}
         int[] direction = validArrayList.get(rand.nextInt(0,validArrayList.size()));
+
+        if(direction == null) {return null;}
+
         int max;
         for (max = 1; max < 9; max++) {
             possibleLocation[0] = p.location[0] + (direction[0]*max);
@@ -83,11 +75,6 @@ public class AI extends Player{
                 System.out.println("\tAI: " + Arrays.toString(possibleLocation) + " not found");
             }
         }
-        /*Optional<int[]> chosen = p.bm.activeSpots.stream().filter(Objects::nonNull).
-                filter(a -> Arrays.equals(a,0,3, possibleLocation,0,3)).
-                findFirst();
-        return chosen.orElse(null);
-        *///return rand.nextInt(1,max-1);
         return chosen;
     }
 }

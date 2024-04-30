@@ -5,7 +5,6 @@ import java.util.*;
 public class BoardAndMovement {
     public ArrayList<int[]> activeSpots = new ArrayList<>();
     public ArrayList<Penguin> activePenguins = new ArrayList<>();
-    //public ArrayList<Integer> occupiedIndexes = new ArrayList<>();
 
     public void addPenguins(Penguin p) {
         activePenguins.add(p);
@@ -70,13 +69,8 @@ public class BoardAndMovement {
     }
 
     public void removeSpot(int[] oldLocation){
-        //if(activeSpots.removeIf(a -> Arrays.equals(a, 0, 3, oldLocation, 0,3)))
-        //  System.out.println(Arrays.toString(oldLocation) + " removed successfully");
-        //else
-        //  System.out.println(Arrays.toString(oldLocation) + " is not in the array");
         activeSpots.stream().filter(Objects::nonNull).filter(a -> a == oldLocation).findFirst().ifPresent(a -> activeSpots.set(activeSpots.indexOf(a), null));
     }
-
 
     public boolean validMove(Penguin p, int[] desired) {
         int[] current = Arrays.copyOf(p.location, p.location.length);
@@ -103,9 +97,6 @@ public class BoardAndMovement {
         return false;
     }
 
-    //TO DO: Test more and optimize space (time seems good enough)
-    //TO DO: Check with activeSpots now null not removed
-    //Tested 1 Worst case (8 penguins full board) (1 penguin full board), 1 cornered case (1 penguin), and 1 true isolated island (1 penguin)
     public ArrayList<Integer> checkForIsolation() {
         ArrayList<Boolean> reachable = new ArrayList<>();
         ArrayList<Integer> remove = new ArrayList<>();
@@ -144,9 +135,6 @@ public class BoardAndMovement {
 
                         //Add the space to the queue to see if it has any other spots that it can access
                         toVisit.add(Arrays.copyOf(nextSpace, nextSpace.length));
-                        //Optional<Penguin> penPlace = activePenguins.stream().filter(Objects::nonNull).filter(a -> Arrays.equals(a.location, 0, 3, nextSpace, 0,3)).findFirst();
-                        //penPlace.ifPresent(tempPenguins::remove); //Possible error location but unlikely
-                        //Penguins don't set their activeSpot to null until after they've been moved
                     }
                 }
                 toVisit.remove(0);
@@ -156,16 +144,9 @@ public class BoardAndMovement {
             if(reachable.get(i))
                 continue;
             else {
-                //activeSpots.set(i,null);
                 remove.add(i);
             }
         }
-//    removeIf(a -> !reachable.get(activeSpots.indexOf(a)));
-        /* for (int i = reachable.size()-1; i >= 0; i--) {
-            if(reachable.get(i) == false) {
-                System.out.println(Arrays.toString(activeSpots.remove(i)));
-            }
-        } */
 
         for(Integer i : remove) {
             System.out.println("\tBM: Remove requested: " + i);
@@ -188,8 +169,7 @@ public class BoardAndMovement {
         //ERROR HERE ^
         //activeSpots set to null when penguin is placed there
         //Rework to only set to null after penguin leaves or something
+        //4/29: Above likely resolved; not receiving any errors
 
-
-        //return null;
     }
 }

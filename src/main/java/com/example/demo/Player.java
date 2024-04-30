@@ -1,6 +1,5 @@
 package com.example.demo;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -27,7 +26,6 @@ public class Player implements Subject {
 
     public void addPenguinPlayer(Penguin p) {
         penguins.add(p);
-        //p.bm.addPenguins(p);
     }
 
     public ArrayList<Penguin> getPenguins(){return penguins;}
@@ -52,8 +50,6 @@ public class Player implements Subject {
             if(removed)
                 removedPenguins.add(p);
         }
-        //penguins.get(0).bm.activePenguins.removeAll(removedPenguins);
-        //penguins.removeAll(removedPenguins);
         for(Penguin p : removedPenguins) {
             System.out.println("\tPlayer: Remove request: " + Arrays.toString(p.location));
         }
