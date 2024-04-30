@@ -5,6 +5,7 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
@@ -39,8 +40,8 @@ public class HeyThatsMyFishGame extends Application {
     private List<Integer> fishTiles = new ArrayList<>();
     private List<Integer> fishScores = new ArrayList<>();
     private List<TileButton> fishTileButtons = new ArrayList<>();
-    private TextField playerOneScore;
-    private TextField playerTwoScore;
+    private Label playerOneScore;
+    private Label playerTwoScore;
     private Stage primaryStage;
     private Pane root;
     private Scene scene;
@@ -54,7 +55,6 @@ public class HeyThatsMyFishGame extends Application {
     private ImageView imageView = new ImageView();
     private boolean allPlaced = false;
     private HBox currentPenguinDisplay;
-
 
     @Override
     public void start(Stage primaryStage) {
@@ -81,12 +81,12 @@ public class HeyThatsMyFishGame extends Application {
     private void createGameBoard(int numPlayers) {
         HBox penguinScreen = createPenguinDisplay();
         this.currentPenguinDisplay = penguinScreen;
-        penguinScreen.setAlignment(Pos.TOP_LEFT);
-        root.getChildren().add(penguinScreen); // Optionally manage penguins based on players
         HBox pengAndScores = new HBox();
-        pengAndScores.getChildren().add(penguinScreen);
+        penguinScreen.setAlignment(Pos.TOP_LEFT);
+        //root.getChildren().add(penguinScreen); // Optionally manage penguins based on players
         VBox scoreScreen = createScoreBoardDisplay();
         pengAndScores.getChildren().add(scoreScreen);
+        pengAndScores.getChildren().add(penguinScreen);
         pengAndScores.setAlignment(Pos.TOP_RIGHT);
         HBox.setHgrow(pengAndScores,Priority.ALWAYS);
         root.getChildren().add(pengAndScores);
@@ -103,8 +103,8 @@ public class HeyThatsMyFishGame extends Application {
 
     private VBox createScoreBoardDisplay() {
         VBox scores = new VBox(2);
-        playerOneScore = new TextField("Player 1: " + playerScore);
-        playerTwoScore = new TextField("Player 2: " + opponentScore);
+        playerOneScore = new Label("Player 1: " + playerScore);
+        playerTwoScore = new Label("Player 2: " + opponentScore);
         scores.getChildren().addAll(playerOneScore, playerTwoScore);
         return scores;
     }
@@ -304,6 +304,7 @@ public class HeyThatsMyFishGame extends Application {
 
                                 TileButton button = fishTileButtons.get(FISHID);
                                 button.setGraphic(aiPeng.getImageView());
+                                currentPenguinDisplay.getChildren().remove(4);
                                 int fish = bmSelected.get()[3];
                                 opponentScore += fish;
                                 playerTwoScore.setText("Player 2: " + opponentScore);
