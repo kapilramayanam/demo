@@ -109,8 +109,6 @@ public class BoardAndMovement {
     public ArrayList<Integer> checkForIsolation() {
         ArrayList<Boolean> reachable = new ArrayList<>();
         ArrayList<Integer> remove = new ArrayList<>();
-    public void checkForIsolation() {
-        ArrayList<Boolean> reachable = new ArrayList<>();
         for (int i = 0; i < activeSpots.size(); i++) reachable.add(false);
         final int[][] directions = {{0,-1,1},{0,1,-1},{-1,0,1},{1,0,-1},{1,-1,0},{-1,1,0}};
         ArrayList<int[]> toVisit = new ArrayList<>();
@@ -149,18 +147,6 @@ public class BoardAndMovement {
                         //Optional<Penguin> penPlace = activePenguins.stream().filter(Objects::nonNull).filter(a -> Arrays.equals(a.location, 0, 3, nextSpace, 0,3)).findFirst();
                         //penPlace.ifPresent(tempPenguins::remove); //Possible error location but unlikely
                         //Penguins don't set their activeSpot to null until after they've been moved
-        while(!tempPenguins.isEmpty()) {
-            Penguin p = tempPenguins.remove(0);
-            toVisit.add(Arrays.copyOf(p.location, 3));
-            while(!toVisit.isEmpty()) {
-                for (int i = 0; i < directions.length; i++) {
-                    int[] nextSpace = addAll(Arrays.copyOf(toVisit.get(0),3), directions[i]);
-                    Optional<int[]> accessedSpace = activeSpots.stream().filter(Objects::nonNull).filter(a -> Arrays.equals(a,0,3,nextSpace,0,3)).findFirst();
-                    if(accessedSpace.isPresent() && !reachable.get(activeSpots.indexOf(accessedSpace.get()))) {
-                        reachable.set(activeSpots.indexOf(accessedSpace.get()), true);
-                        toVisit.add(Arrays.copyOf(nextSpace, nextSpace.length));
-                        Optional<Penguin> penPlace = activePenguins.stream().filter(Objects::nonNull).filter(a -> Arrays.equals(a.location, 0, 3, nextSpace, 0,3)).findFirst();
-                        penPlace.ifPresent(tempPenguins::remove);
                     }
                 }
                 toVisit.remove(0);
@@ -173,7 +159,6 @@ public class BoardAndMovement {
                 //activeSpots.set(i,null);
                 remove.add(i);
             }
-            activeSpots.set(i,null);
         }
 //    removeIf(a -> !reachable.get(activeSpots.indexOf(a)));
         /* for (int i = reachable.size()-1; i >= 0; i--) {
@@ -181,6 +166,7 @@ public class BoardAndMovement {
                 System.out.println(Arrays.toString(activeSpots.remove(i)));
             }
         } */
+
         for(Integer i : remove) {
             System.out.println("\tBM: Remove requested: " + i);
         }
@@ -206,5 +192,4 @@ public class BoardAndMovement {
 
         //return null;
     }
-}
 }
