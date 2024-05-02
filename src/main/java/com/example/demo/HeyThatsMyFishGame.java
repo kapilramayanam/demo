@@ -428,10 +428,10 @@ public class HeyThatsMyFishGame extends Application {
                             }
                             System.out.println("Game over!");
 
-                        } else if(numPlayers == 2 && (playerOne.getPenguins().isEmpty() ||
-                                playerTwo.getPenguins().isEmpty())) {
-                            //Skip player
-                            turn++;
+                        } else if(numPlayers == 2 && (playerOne.getPenguins().isEmpty())){
+                            turn = 0;
+                        } else if(numPlayers == 2 && playerTwo.getPenguins().isEmpty()) {
+                            turn = 1;
                         }
                     }
                 });
@@ -537,7 +537,9 @@ public class HeyThatsMyFishGame extends Application {
 
                     }
 
-                    if(numPlayers == 1 && ai.getPenguins().isEmpty()) {return selected;}
+                    if((turn%2 == 1 && ((numPlayers == 1 && ai.getPenguins().isEmpty())
+                            ||(numPlayers == 2 && playerTwo.getPenguins().isEmpty())))
+                            || (numPlayers == 2 && playerOne.getPenguins().isEmpty())) {return selected;}
                     System.out.println("Main: Turn: " + (++turn));
 
                     return selected;
